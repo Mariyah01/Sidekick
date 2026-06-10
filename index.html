@@ -407,6 +407,10 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
   <div class="ob-wrap">
     <div class="ob-logo">🎮 Sidekick</div>
     <div class="ob-tagline">Your family's gaming sidekick — filter, discover, and decide what to play next.</div>
+    <div style="margin-bottom:1.25rem;padding:.75rem 1rem;background:rgba(91,126,245,.08);border:1px solid rgba(91,126,245,.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem">
+      <div style="font-size:12px;color:var(--text2)">Already in a family room? Sign in to sync your library automatically.</div>
+      <button class="hbtn-sync" id="ob-signin-btn" onclick="fbLoad(function(){ fbInitAuth(); fbSignIn(); })" style="flex-shrink:0">☁ Sign in</button>
+    </div>
     <div class="ob-card">
       <h3>Import your game library</h3>
       <p>Upload your Steam export, paste game names, or enter Steam App IDs. Game images are loaded from Steam's CDN. Genre, vibes, difficulty, multiplayer, and score estimates are tagged by Groq AI.</p>
@@ -2875,7 +2879,16 @@ function fbInitAuth(){
       localStorage.setItem('gv6_fbdname',FB_DNAME);
       fbUpdateAuthBtn();
       updateMMSync();
-      if(FB_ROOM){ fbSyncDown(); } else { openRoomSetup(); }
+      if(FB_ROOM){
+        // If still on onboarding screen, show app shell first then sync
+        var ob=document.getElementById('OB');
+        var app=document.getElementById('APP');
+        if(ob&&ob.style.display!=='none'&&app&&app.style.display==='none'){
+          ob.style.display='none';
+          app.style.display='';
+        }
+        fbSyncDown();
+      } else { openRoomSetup(); }
     } else {
       FB_USER=null;
       fbUpdateAuthBtn();
