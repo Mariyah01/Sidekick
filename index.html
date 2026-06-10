@@ -1,0 +1,3209 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sidekick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=optional" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0e13;--bg2:#111520;--bg3:#181d2a;--bg4:#1f2535;--bg5:#252c3d;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.12);
+  --text:#dde0ea;--text2:#8b91a8;--text3:#4a5068;
+  --accent:#5b7ef5;--accent2:#7c5cf5;--aglow:rgba(91,126,245,.12);
+  --green:#3dcc78;--amber:#f5b731;--red:#e85555;--cyan:#1fc8e3;
+  --r:11px;--rs:7px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(ellipse 700px 500px at -5% -8%,rgba(91,126,245,.16),transparent 62%),radial-gradient(ellipse 550px 450px at 108% 108%,rgba(124,92,245,.13),transparent 62%),var(--bg);background-size:auto,auto,auto;color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px}
+a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
+
+/* ONBOARDING */
+#OB{position:fixed;inset:0;background:radial-gradient(ellipse at 25% 35%,rgba(91,126,245,.1) 0%,transparent 55%),radial-gradient(ellipse at 75% 70%,rgba(124,92,245,.08) 0%,transparent 50%),var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem}
+.ob-wrap{max-width:560px;width:100%}
+.ob-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:38px;background:linear-gradient(120deg,#93c5fd,var(--accent),var(--accent2),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.25rem;letter-spacing:-.5px}
+.ob-tagline{color:var(--text2);font-size:13px;margin-bottom:2rem;line-height:1.6}
+.ob-card{background:rgba(17,21,32,0.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(91,126,245,.18);border-radius:16px;padding:2rem;box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05)}
+.ob-card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:.4rem}
+.ob-card p{font-size:12px;color:var(--text2);margin-bottom:1.5rem;line-height:1.6}
+.ob-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
+.ob-m{border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem .75rem;cursor:pointer;transition:all .2s;text-align:center;background:transparent}
+.ob-m:hover,.ob-m.sel{border-color:var(--accent);background:var(--aglow)}
+.ob-m-icon{font-size:20px;margin-bottom:5px}
+.ob-m-label{font-size:12px;font-weight:500;color:var(--text)}
+.ob-m-desc{font-size:10px;color:var(--text3);margin-top:2px}
+.ob-drop{border:2px dashed var(--border2);border-radius:var(--r);padding:1.75rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);margin-bottom:.75rem}
+.ob-drop:hover,.ob-drop.drag{border-color:var(--accent);background:var(--aglow)}
+.ob-drop-icon{font-size:26px;margin-bottom:6px}
+.ob-drop-text{font-size:13px;color:var(--text2)}
+.ob-drop-hint{font-size:10px;color:var(--text3);margin-top:3px}
+#ob-fi{display:none}
+.ob-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;min-height:140px;outline:none;resize:vertical;line-height:1.7;margin-bottom:.5rem}
+.ob-ta:focus{border-color:var(--accent)}.ob-ta::placeholder{color:var(--text3)}
+.ob-status{font-size:11px;min-height:16px;margin-bottom:.875rem}
+.ob-status.ok{color:var(--green)}.ob-status.err{color:var(--red)}
+.ob-btn{width:100%;padding:11px;border-radius:var(--rs);border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:opacity .2s}
+.ob-btn:hover{opacity:.9}.ob-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* PROGRESS */
+#PS{position:fixed;inset:0;background:radial-gradient(ellipse at 25% 35%,rgba(91,126,245,.1) 0%,transparent 55%),radial-gradient(ellipse at 75% 70%,rgba(124,92,245,.08) 0%,transparent 50%),var(--bg);z-index:9998;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem;text-align:center}
+.ps-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;background:linear-gradient(120deg,#93c5fd,var(--accent),var(--accent2),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.3px}
+.ps-msg{font-size:14px;color:var(--text);font-weight:500}
+.ps-bar-w{width:280px;height:3px;background:var(--bg4);border-radius:10px;overflow:hidden}
+.ps-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px;width:0;transition:width .5s ease}
+.ps-sub{font-size:11px;color:var(--text3);max-width:320px;line-height:1.6}
+.ps-count{font-size:12px;color:var(--text2)}
+.ps-log{margin-top:.5rem;max-width:380px;width:100%;background:rgba(255,255,255,.03);border-radius:8px;padding:.5rem .75rem;font-size:10px;color:var(--text3);font-family:monospace;min-height:32px;max-height:90px;overflow-y:auto;text-align:left;line-height:1.7}
+
+/* APP */
+#APP{display:none;position:relative;z-index:1}
+.hdr{background:rgba(10,12,20,0.97);border-bottom:1px solid rgba(91,126,245,.16);padding:0 1.5rem;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:200;gap:1rem;box-shadow:0 2px 28px rgba(0,0,0,.5)}
+.hdr-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;background:linear-gradient(120deg,#93c5fd,var(--accent),var(--accent2),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer;flex-shrink:0;letter-spacing:-.3px}
+.hdr-stats{display:flex;gap:1rem;align-items:center;flex:1}
+.hdr-stat{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.hdr-stat b{color:var(--text);font-family:'Syne',sans-serif;font-weight:700}
+.hdr-acts{display:flex;gap:6px;align-items:center;margin-left:auto}
+.hbtn{padding:5px 10px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:border-color .15s,color .15s,background .15s;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.hbtn:hover{border-color:var(--accent);color:var(--accent);background:var(--aglow)}
+.hbtn.hi{background:linear-gradient(135deg,rgba(91,126,245,.2),rgba(124,92,245,.14));border-color:rgba(91,126,245,.5);color:#a5b4fc;box-shadow:0 0 16px rgba(91,126,245,.2)}
+.hbtn.danger:hover{border-color:var(--red);color:var(--red);background:rgba(232,85,85,.08)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px)}
+
+/* SIDEBAR */
+.sb{background:rgba(12,14,22,0.98);border-right:1px solid rgba(91,126,245,.1);padding:1rem;overflow-y:auto;height:calc(100vh - 60px);position:sticky;top:60px}
+.sb-sec{margin-bottom:1.125rem}
+.sb-lbl{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem}
+.sw{position:relative}
+.sw svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3)}
+.si{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 9px 7px 30px;color:var(--text);font-size:12px;outline:none;transition:border-color .2s}
+.si:focus{border-color:var(--accent)}.si::placeholder{color:var(--text3)}
+.ss{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 26px 7px 9px;color:var(--text);font-size:12px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%234a5068' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-color:var(--bg3)}
+.ss:focus{border-color:var(--accent)}
+.pills{display:flex;flex-wrap:wrap;gap:4px}
+.pill{padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:10px;cursor:pointer;transition:border-color .15s,color .15s,background .15s,box-shadow .15s;white-space:nowrap}
+.pill:hover{border-color:var(--border2);color:var(--text)}
+.pill.on{background:rgba(91,126,245,.16);border-color:rgba(91,126,245,.55);color:#a5b4fc;box-shadow:0 0 8px rgba(91,126,245,.15)}
+.qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.qf{border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;cursor:pointer;transition:border-color .15s,background .15s;background:transparent;text-align:left;width:100%}
+.qf:hover{border-color:var(--border2);background:var(--bg3)}.qf.on{border-color:var(--accent);background:var(--aglow)}
+.qf-icon{font-size:14px;display:block;margin-bottom:2px}
+.qf-label{font-size:10px;font-weight:500;color:var(--text);display:block}
+.qf-desc{font-size:9px;color:var(--text3);display:block;margin-top:1px}
+.vt{display:flex;gap:4px}
+.vb{flex:1;padding:5px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text3);cursor:pointer;transition:border-color .15s,background .15s,color .15s;display:flex;align-items:center;justify-content:center;gap:3px;font-size:10px}
+.vb.on{background:var(--aglow);border-color:var(--accent);color:var(--accent)}
+.vb:hover:not(.on){border-color:var(--border2);color:var(--text2)}
+.clr{width:100%;padding:6px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:10px;cursor:pointer;transition:border-color .15s,color .15s}
+.clr:hover{border-color:var(--red);color:var(--red)}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-height:calc(100vh - 60px)}
+.wizard-banner{background:linear-gradient(135deg,rgba(91,126,245,.1),rgba(124,92,245,.06));border-bottom:1px solid rgba(91,126,245,.18);padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0}
+.wb-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px}
+.wb-sub{font-size:11px;color:var(--text2)}
+.wb-btn{padding:7px 16px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:opacity .2s;white-space:nowrap;flex-shrink:0}
+.wb-btn:hover{opacity:.88}
+.rbar{display:flex;align-items:center;gap:.875rem;padding:.75rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.rc{font-size:11px;color:var(--text2);margin-right:auto}
+.rc b{color:var(--text);font-family:'Syne',sans-serif}
+.stale-w{font-size:10px;color:var(--amber);padding:3px 8px;background:rgba(245,183,49,.08);border:1px solid rgba(245,183,49,.2);border-radius:20px}
+.scroll-area{flex:1;overflow-y:auto;padding:1rem}
+.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.875rem}
+.gl{display:flex;flex-direction:column;gap:5px}
+
+/* GAME CARD */
+.gc{background:linear-gradient(160deg,rgba(22,27,42,0.95) 0%,rgba(14,17,26,1) 100%);border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;position:relative;overflow:hidden;display:flex;flex-direction:column;contain:layout}
+.gc:hover{border-color:rgba(91,126,245,.4);transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,.55)}
+.gc-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to bottom,transparent,rgba(12,14,19,.68));pointer-events:none;border-radius:0}
+.gc.fav{border-color:rgba(245,183,49,.22)}
+.gc .acc{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s}
+.gc:hover .acc,.gc.fav .acc{opacity:1}
+.gc-img{width:100%;aspect-ratio:460/215;position:relative;background:var(--bg3);overflow:hidden;border-radius:var(--r) var(--r) 0 0;flex-shrink:0}
+.gc-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.gc:hover .gc-img img{transform:scale(1.04)}
+.gc-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--text3)}
+.gc-mc{position:absolute;bottom:6px;right:6px;border-radius:6px;padding:2px 7px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;background:rgba(0,0,0,.82)}
+.gc-fav{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);border:none;border-radius:5px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:color .15s,background .15s}
+.gc-fav:hover{color:var(--amber);background:rgba(0,0,0,.8)}.gc-fav.on{color:var(--amber)}
+.gc-q{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border:none;border-radius:5px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--text3);transition:color .15s,background .15s}
+.gc-q:hover{color:var(--cyan);background:rgba(0,0,0,.8)}.gc-q.on{color:var(--cyan)}
+.gc-body{padding:.7rem;flex:1;display:flex;flex-direction:column;gap:5px}
+.gc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;line-height:1.3;color:var(--text)}
+.gc-tags{display:flex;flex-wrap:wrap;gap:3px}
+.tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+.gc-desc{font-size:10px;color:var(--text3);line-height:1.45;flex:1}
+.gc-foot{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-top:auto;padding-top:4px}
+.dd{display:flex;gap:2px;align-items:center}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--border2)}
+.dot.on{background:currentColor}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.gc-star{font-size:10px;color:#f5b731;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.5px}
+.star-row{display:flex;align-items:center;gap:0;cursor:pointer;user-select:none;-webkit-user-select:none}
+.star{font-size:22px;color:var(--text3);transition:color .1s;line-height:1;padding:0 2px}
+.star.lit{color:#f5b731}
+.edit-tags-btn{background:var(--bg4);border:1px solid var(--border2);border-radius:var(--rs);cursor:pointer;color:var(--text2);font-size:11px;font-family:'DM Sans',sans-serif;padding:3px 10px;transition:border-color .15s,color .15s,background .15s}
+.edit-tags-btn:hover{border-color:rgba(91,126,245,.45);color:#a5b4fc;background:rgba(91,126,245,.08)}
+.edited-badge{font-size:9px;color:var(--accent);background:rgba(91,126,245,.1);border:1px solid rgba(91,126,245,.2);border-radius:10px;padding:1px 6px;margin-left:5px;vertical-align:middle}
+.edit-panel{background:var(--bg3);border:1px dashed rgba(91,126,245,.25);border-radius:var(--r);padding:.875rem;margin-top:.5rem}
+.edit-row{margin-bottom:.625rem}
+.edit-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px}
+.edit-tp{display:flex;flex-wrap:wrap;gap:4px}
+.ep{padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.ep.on{background:rgba(91,126,245,.16);border-color:rgba(91,126,245,.55);color:#a5b4fc}
+.edit-save{padding:6px 16px;border-radius:var(--rs);border:1px solid rgba(91,126,245,.5);background:rgba(91,126,245,.12);color:#a5b4fc;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s}
+.edit-save:hover{background:rgba(91,126,245,.22)}
+.edit-cancel{padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;transition:border-color .15s}
+/* MANAGEMENT MODAL */
+.mm-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:1.5rem 1.5rem 1rem;border-bottom:1px solid var(--border)}
+.mm-status{font-size:11px;color:var(--text2);margin-top:3px}
+.mm-body{padding:.5rem 0 .75rem}
+.mm-sec{padding:.75rem 1.5rem}
+.mm-sec+.mm-sec{border-top:1px solid var(--border)}
+.mm-sec-lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:.625rem;font-family:'Syne',sans-serif}
+.mm-acts{display:flex;flex-direction:column;gap:.5rem}
+.mm-act{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem .625rem;background:var(--bg3);border-radius:var(--rs)}
+.mm-act-info{flex:1;min-width:0}
+.mm-act-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.mm-act-desc{font-size:11px;color:var(--text3);line-height:1.4}
+.mm-btn{flex-shrink:0;padding:5px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s,background .15s}
+.mm-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--aglow)}
+.mm-btn-danger{border-color:rgba(232,85,85,.3);color:#f87171;background:rgba(232,85,85,.06)}
+.mm-btn-danger:hover{border-color:rgba(232,85,85,.6);color:#fca5a5;background:rgba(232,85,85,.12)}
+.mm-danger{background:rgba(232,85,85,.03);border-radius:0 0 18px 18px}
+
+/* LIST */
+.li{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:.5rem .875rem;cursor:pointer;transition:border-color .15s;display:grid;grid-template-columns:46px 1fr 100px 90px 50px 24px 24px;align-items:center;gap:.625rem}
+.li:hover{border-color:var(--border2)}.li.fav{border-color:rgba(245,183,49,.18)}
+.li-thumb{width:46px;height:22px;border-radius:3px;object-fit:cover;background-color:var(--bg3);flex-shrink:0}
+.li-title{font-family:'Syne',sans-serif;font-weight:600;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-sub{font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-tags{display:flex;gap:3px;overflow:hidden}
+.li-mp{font-size:9px;color:var(--text3);line-height:1.5}
+.li-mc{font-family:'Syne',sans-serif;font-size:12px;font-weight:800}
+.li-btn{background:none;border:none;cursor:pointer;transition:color .15s;font-size:12px;justify-self:center}
+
+/* MODALS */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:all}
+.mw{background:rgba(15,19,30,0.95);border:1px solid rgba(91,126,245,.18);box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);border-radius:18px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(10px);transition:transform .2s;position:relative}
+.mo.open .mw{transform:translateY(0)}
+.mx{position:absolute;top:.875rem;right:.875rem;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.1);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;transition:background .15s,color .15s;font-size:12px;z-index:10}
+.mx:hover{background:rgba(0,0,0,.9)}
+.m-hero{width:100%;aspect-ratio:460/215;overflow:hidden;border-radius:18px 18px 0 0;position:relative;background:var(--bg3)}
+.m-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.m-hero-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--text3)}
+.m-mc{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.88);border-radius:8px;padding:5px 10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800}
+.m-body{padding:1.25rem}
+.m-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:.2rem;line-height:1.2;padding-right:2rem}
+.m-sub{color:var(--text2);font-size:11px;margin-bottom:.875rem}
+.m-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.875rem}
+.m-desc{color:var(--text2);font-size:12px;line-height:1.7;margin-bottom:1rem}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1rem}
+.ms{background:var(--bg3);border-radius:var(--rs);padding:8px 10px}
+.msl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:3px}
+.msv{font-size:12px;font-weight:500;color:var(--text)}
+.m-why{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:var(--text2);line-height:1.6;font-style:italic;margin-bottom:1rem}
+.m-sec{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;margin-bottom:.625rem;display:flex;align-items:center;gap:6px;color:var(--text)}
+.divider{height:1px;background:var(--border);margin:.875rem 0}
+.play-log{display:flex;flex-direction:column;gap:5px;margin-bottom:.875rem}
+.play-entry{background:var(--bg3);border-radius:var(--rs);padding:7px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.play-who{font-family:'Syne',sans-serif;font-weight:600;font-size:11px;color:var(--accent)}
+.play-date{font-size:10px;color:var(--text3)}
+.play-note{font-size:11px;color:var(--text2)}
+.play-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:10px;transition:color .15s}
+.play-del:hover{color:var(--red)}
+.pf-in{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;transition:border-color .2s;width:100%}
+.pf-in:focus{border-color:var(--accent)}.pf-in::placeholder{color:var(--text3)}
+.pf-row{display:flex;gap:6px;margin-bottom:6px}
+.pf-submit{padding:7px 14px;border-radius:var(--rs);border:1px solid var(--border);background:var(--bg4);color:var(--text2);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.pf-submit:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.comment{background:var(--bg3);border-radius:var(--rs);padding:8px 10px;margin-bottom:6px}
+.c-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.c-author{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
+.c-rating{color:var(--amber);font-size:9px}
+.c-date{font-size:9px;color:var(--text3)}
+.c-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:9px;transition:color .15s}
+.c-del:hover{color:var(--red)}
+.c-text{font-size:11px;color:var(--text2);line-height:1.55}
+.no-data{font-size:11px;color:var(--text3);font-style:italic;padding:4px 0;margin-bottom:.5rem}
+.cf-row{display:flex;gap:6px;margin-bottom:6px}
+.cf-submit{padding:6px 14px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:opacity .15s}
+.cf-submit:hover{opacity:.88}
+.m-acts{display:flex;gap:6px;padding-top:.875rem;border-top:1px solid var(--border)}
+.mab{flex:1;padding:8px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;text-decoration:none;font-family:'DM Sans',sans-serif}
+.mab:hover{border-color:var(--accent);color:var(--accent);background:var(--aglow)}
+.mab.pri{background:var(--accent);border-color:var(--accent);color:#fff}.mab.pri:hover{opacity:.88}
+/* SIMILAR PANEL */
+.sim-inner{padding-top:.25rem}
+.sim-scroll{max-height:188px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sim-scroll::-webkit-scrollbar{width:4px}
+.sim-scroll::-webkit-scrollbar-track{background:transparent}
+.sim-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sim-section-hdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;-webkit-user-select:none;padding:.625rem 0;font-size:12px;font-weight:700;color:var(--text2);font-family:'Syne',sans-serif;transition:color .15s}
+.sim-section-hdr:hover{color:var(--text)}
+.sim-hdr-arrow{font-size:11px;font-weight:400;color:var(--text3);transition:color .15s}
+.sim-section-hdr:hover .sim-hdr-arrow{color:var(--text2)}
+.sim-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:.625rem;font-family:'Syne',sans-serif}
+.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.sim-card{display:flex;gap:.625rem;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.5rem .625rem;cursor:pointer;transition:border-color .15s,background .15s}
+.sim-card:hover{border-color:var(--border2);background:var(--bg4)}
+.sim-thumb{width:52px;height:25px;border-radius:3px;object-fit:cover;flex-shrink:0;background:var(--bg5)}
+.sim-info{min-width:0;flex:1}
+.sim-title{font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;font-family:'Syne',sans-serif}
+.sim-reason{font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* WIZARD */
+.wiz-wrap{padding:2rem}
+.wiz-q{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:.35rem;line-height:1.25}
+.wiz-hint{font-size:12px;color:var(--text2);margin-bottom:1.25rem}
+.wiz-opts{display:grid;gap:8px}.wiz-opts.cols2{grid-template-columns:1fr 1fr}
+.wiz-opt{border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem 1rem;cursor:pointer;transition:all .2s;background:transparent;text-align:left;width:100%}
+.wiz-opt:hover,.wiz-opt.sel{border-color:var(--accent);background:var(--aglow)}
+.wiz-opt-icon{font-size:20px;margin-bottom:5px;display:block}
+.wiz-opt-label{font-size:13px;font-weight:500;color:var(--text);display:block}
+.wiz-opt-desc{font-size:10px;color:var(--text2);margin-top:2px;display:block}
+.wiz-nav{display:flex;gap:8px;margin-top:1.5rem}
+.wiz-back{padding:9px 16px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
+.wiz-back:hover{border-color:var(--border2);color:var(--text)}
+.wiz-next{flex:1;padding:9px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .2s}
+.wiz-next:hover{opacity:.88}.wiz-next:disabled{opacity:.3;cursor:not-allowed}
+.rec-list{display:flex;flex-direction:column;gap:10px;margin-top:1.25rem}
+.rec-card{background:var(--bg3);border-radius:var(--r);overflow:hidden;display:flex;border:1px solid var(--border);cursor:pointer}
+.rec-card:hover{border-color:var(--border2)}
+.rec-img{width:110px;flex-shrink:0;background:var(--bg4);overflow:hidden}
+.rec-img img{width:100%;height:100%;object-fit:cover;display:block}
+.rec-body{padding:.875rem;flex:1;min-width:0}
+.rec-num{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px}
+.rec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;color:var(--text)}
+.rec-why{font-size:11px;color:var(--text2);line-height:1.55;margin-bottom:8px;font-style:italic}
+.rec-tags{display:flex;flex-wrap:wrap;gap:4px}
+.wiz-retry{width:100%;margin-top:.875rem;padding:8px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
+.wiz-retry:hover{border-color:var(--border2);color:var(--text)}
+
+/* SPIN */
+.spin-wrap{text-align:center;padding:1.5rem}
+.spin-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:.35rem}
+.spin-sub{font-size:12px;color:var(--text2);margin-bottom:1.25rem}
+.spin-card{background:var(--bg3);border-radius:var(--r);overflow:hidden;margin:0 auto;max-width:320px;border:1px solid var(--border2)}
+.spin-card img{width:100%;aspect-ratio:460/215;object-fit:cover;display:block}
+.spin-body{padding:1rem}
+.spin-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:.5rem}
+.spin-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.625rem}
+.spin-why{font-size:11px;color:var(--text2);font-style:italic;line-height:1.55}
+.spin-btn{margin-top:.875rem;width:100%;padding:11px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:opacity .2s}
+.spin-btn:hover{opacity:.88}
+.spin-btn.alt{background:var(--bg4);color:var(--text2);border:1px solid var(--border);margin-top:8px}
+
+/* OVERLAYS */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.open{opacity:1;pointer-events:all}
+.ow{background:rgba(15,19,30,0.96);border:1px solid rgba(91,126,245,.18);box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);border-radius:18px;padding:1.75rem;max-width:580px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.ow h2{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:.4rem}
+.ow p{font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6}
+.ow-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;min-height:220px;outline:none;resize:vertical;line-height:1.7}
+.ow-ta:focus{border-color:var(--accent)}
+.ow-tip{font-size:10px;color:var(--text3);margin-top:.625rem;padding:7px 9px;background:var(--bg3);border-radius:6px;line-height:1.5}
+.ow-acts{display:flex;gap:7px;margin-top:.875rem}
+.ow-btn{flex:1;padding:9px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
+.ow-btn:hover{border-color:var(--border2);color:var(--text)}
+.ow-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700}.ow-btn.pri:hover{opacity:.9}
+
+/* MISC */
+.empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;color:var(--text3);gap:.75rem;text-align:center}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 14px;font-size:12px;color:var(--text);z-index:9999;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none;max-width:260px}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* BACKGROUND SHAPES */
+#BG{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Ccircle cx='1.5' cy='1.5' r='1' fill='%235b7ef5' fill-opacity='0.11'/%3E%3C/svg%3E");background-size:30px 30px}
+.bg-s{position:absolute;border-radius:36px;pointer-events:none}
+.bg-s1{width:560px;height:560px;top:-90px;right:-70px;transform:rotate(22deg);border:1px solid rgba(91,126,245,.22);background:rgba(91,126,245,.04)}
+.bg-s2{width:380px;height:380px;bottom:-80px;left:-70px;transform:rotate(-17deg);border:1px solid rgba(124,92,245,.2);background:rgba(124,92,245,.035)}
+.bg-s3{width:480px;height:480px;top:22%;right:-110px;border-radius:50%;border:1px solid rgba(31,200,227,.14);background:rgba(31,200,227,.02)}
+
+/* SIDEBAR OVERLAY */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:150}
+
+/* HAMBURGER — hidden on desktop */
+.hbtn-ham{display:none;width:32px;height:32px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;color:var(--text2);cursor:pointer;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;padding:0;transition:border-color .15s,color .15s,background .15s}
+.hbtn-ham:hover{border-color:var(--accent);color:var(--accent);background:var(--aglow)}
+
+/* TABLET (861px–1100px) — narrower sidebar */
+@media(max-width:1100px){
+  .layout{grid-template-columns:200px 1fr}
+}
+
+/* MOBILE (<= 860px) — sidebar drawer */
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr}
+  /* Slide-in drawer */
+  .sb{
+    position:fixed;left:0;top:60px;bottom:0;width:282px;z-index:200;
+    transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+    box-shadow:8px 0 32px rgba(0,0,0,.5);height:auto
+  }
+  .sb.open{transform:translateX(0)}
+  .sb-overlay.open{display:block}
+  /* Header */
+  .hdr-stats{display:none}
+  .hbtn-ham{display:flex}
+  .hdr-acts{overflow-x:auto;-webkit-overflow-scrolling:touch;gap:4px;scrollbar-width:none}
+  .hdr-acts::-webkit-scrollbar{display:none}
+  /* List items */
+  .li{grid-template-columns:46px 1fr auto}
+  /* Modals — slide up from bottom */
+  .mo{padding:0;align-items:flex-end}
+  .mw{max-height:92vh;border-radius:18px 18px 0 0;max-width:100%}
+  /* Cards */
+  .gg{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  /* Overlays */
+  .ow{border-radius:18px 18px 0 0;max-height:92vh}
+}
+
+/* SMALL PHONES (<= 480px) */
+@media(max-width:480px){
+  .gg{grid-template-columns:1fr 1fr;gap:.5rem}
+  .scroll-area{padding:.625rem}
+  .hdr{padding:0 .75rem;gap:.5rem}
+  .ob-wrap{padding:1.25rem 0}
+  .ob-card{padding:1.25rem}
+  .ob-methods{grid-template-columns:1fr 1fr}
+  .ob-methods .ob-m:last-child{grid-column:1/-1}
+  .mgrid{grid-template-columns:1fr}
+  .wiz-opts.cols2{grid-template-columns:1fr}
+  .rec-img{width:80px}
+}
+/* FIREBASE AUTH */
+.hbtn-sync{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.hbtn-sync:hover{border-color:var(--accent);color:var(--accent)}
+.hbtn-sync.authed{border-color:rgba(74,222,128,.35);color:#4ade80}
+.fb-avatar{width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0;vertical-align:middle}
+/* ROOM SETUP MODAL */
+.rs-body{padding:1.5rem}
+.rs-title{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--text);margin-bottom:.3rem}
+.rs-sub{font-size:12px;color:var(--text3);margin-bottom:1.25rem;line-height:1.5}
+.rs-lbl{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px}
+.rs-divider{display:flex;align-items:center;gap:.75rem;margin:.875rem 0;color:var(--text3);font-size:11px}
+.rs-divider:before,.rs-divider:after{content:'';flex:1;height:1px;background:var(--border)}
+/* PLAY ENTRY PRIVATE */
+.play-priv{font-size:9px;color:var(--text3);opacity:.7;margin-left:2px}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND SHAPES -->
+<div id="BG" aria-hidden="true">
+  <div class="bg-s bg-s1"></div>
+  <div class="bg-s bg-s2"></div>
+  <div class="bg-s bg-s3"></div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="OB">
+  <div class="ob-wrap">
+    <div class="ob-logo">🎮 Sidekick</div>
+    <div class="ob-tagline">Your family's gaming sidekick — filter, discover, and decide what to play next.</div>
+    <div class="ob-card">
+      <h3>Import your game library</h3>
+      <p>Upload your Steam export, paste game names, or enter Steam App IDs. Game images are loaded from Steam's CDN. Genre, vibes, difficulty, multiplayer, and score estimates are tagged by Groq AI.</p>
+      <div class="ob-methods">
+        <div class="ob-m sel" data-m="file" onclick="selM('file')"><div class="ob-m-icon">📄</div><div class="ob-m-label">Upload File</div><div class="ob-m-desc">Excel, CSV, or TXT</div></div>
+        <div class="ob-m" data-m="paste" onclick="selM('paste')"><div class="ob-m-icon">📋</div><div class="ob-m-label">Paste Names</div><div class="ob-m-desc">One per line</div></div>
+        <div class="ob-m" data-m="ids" onclick="selM('ids')"><div class="ob-m-icon">🔢</div><div class="ob-m-label">App IDs</div><div class="ob-m-desc">Most accurate</div></div>
+      </div>
+      <div id="ob-area"></div>
+      <div class="ob-status" id="ob-status"></div>
+      <div style="border:1px solid var(--border);border-radius:var(--rs);padding:.875rem;margin-bottom:.5rem;background:var(--bg3)">
+        <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:.5rem">🤖 Groq API Key <span style="font-size:10px;color:var(--text3);font-weight:400">— free · genre / vibe / difficulty / multiplayer tagging</span></div>
+        <input type="password" id="ob-akey" placeholder="gsk_…" class="ob-ta" style="min-height:unset;height:36px;padding:7px 10px;font-family:monospace;font-size:11px;margin-bottom:.375rem">
+        <div style="font-size:10px;color:var(--text3)">Free at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);text-decoration:underline">console.groq.com/keys</a> (no credit card) · Key starts with <code>gsk_</code></div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:var(--rs);padding:.875rem;margin-bottom:.875rem;background:var(--bg3)">
+        <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:.5rem">🏆 RAWG API Key <span style="font-size:10px;color:var(--text3);font-weight:400">— free · official Metacritic scores</span></div>
+        <input type="password" id="ob-rkey" placeholder="(optional)" class="ob-ta" style="min-height:unset;height:36px;padding:7px 10px;font-family:monospace;font-size:11px;margin-bottom:.375rem">
+        <div style="font-size:10px;color:var(--text3)">Free at <a href="https://rawg.io/apidocs" target="_blank" style="color:var(--accent);text-decoration:underline">rawg.io/apidocs</a> → "Get API key" (no credit card) · 100,000 requests/month</div>
+      </div>
+      <button class="ob-btn" id="ob-btn" onclick="startImport()" disabled>Import &amp; Build Library</button>
+      <div style="margin-top:.875rem;font-size:10px;color:var(--text3);text-align:center">Images from Steam CDN · Genre / vibe / difficulty via Groq · Official Metacritic via RAWG</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="PS">
+  <div class="ps-logo">🎮 Sidekick</div>
+  <div class="ps-msg" id="ps-msg">Starting…</div>
+  <div class="ps-bar-w"><div class="ps-bar" id="ps-bar"></div></div>
+  <div class="ps-count" id="ps-count"></div>
+  <div class="ps-sub" id="ps-sub"></div>
+  <div class="ps-log" id="ps-log"></div>
+</div>
+
+<!-- APP -->
+<div id="APP">
+  <header class="hdr">
+    <div class="hdr-logo" onclick="closeSidebar()">🎮 Sidekick</div>
+    <div class="hdr-stats">
+      <div class="hdr-stat">Total <b id="s-total">–</b></div>
+      <div class="hdr-stat">Co-op <b id="s-coop">–</b></div>
+      <div class="hdr-stat">Versus <b id="s-vs">–</b></div>
+    </div>
+    <div class="hdr-acts">
+      <button class="hbtn-ham" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+      <button class="hbtn hi" onclick="openWizard()">🎯 What to play?</button>
+      <button class="hbtn" onclick="openRandom()">🎲 Random</button>
+      <button class="hbtn" id="fav-btn" onclick="openFM()">⭐ Favorites <b id="s-fav">0</b></button>
+      <button class="hbtn" id="queue-btn" onclick="openQM()">▶ Queue <b id="s-queue">0</b></button>
+      <button class="hbtn" onclick="openEdit()">✏️ Edit</button>
+      <button class="hbtn" onclick="openMM()">⚙ Manage</button>
+      <button class="hbtn-sync" id="fb-auth-btn" title="Sign in to sync with family">☁ Sign in</button>
+      <button class="hbtn danger" onclick="resetApp()">✕</button>
+    </div>
+  </header>
+  <div class="layout">
+    <div class="sb-overlay" id="SBO" onclick="closeSidebar()"></div>
+    <aside class="sb" id="SB">
+      <div class="sb-sec">
+        <div class="sb-lbl">Search</div>
+        <div class="sw">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="si" type="text" id="Q" placeholder="Search games…">
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Quick Filters</div>
+        <div class="qf-grid">
+          <button class="qf" data-qf="family" onclick="applyQF(this)"><span class="qf-icon">👨‍👩‍👧</span><span class="qf-label">Family Night</span><span class="qf-desc">Local co-op, easy</span></button>
+          <button class="qf" data-qf="chill" onclick="applyQF(this)"><span class="qf-icon">🛋️</span><span class="qf-label">Chill Out</span><span class="qf-desc">Cozy vibes</span></button>
+          <button class="qf" data-qf="quick" onclick="applyQF(this)"><span class="qf-icon">⚡</span><span class="qf-label">Quick</span><span class="qf-desc">Under 30 min</span></button>
+          <button class="qf" data-qf="challenge" onclick="applyQF(this)"><span class="qf-icon">💀</span><span class="qf-label">Challenge</span><span class="qf-desc">Hard or brutal</span></button>
+          <button class="qf" data-qf="story" onclick="applyQF(this)"><span class="qf-icon">📖</span><span class="qf-label">Story Time</span><span class="qf-desc">Narrative, emotional</span></button>
+          <button class="qf" data-qf="online" onclick="applyQF(this)"><span class="qf-icon">🌐</span><span class="qf-label">Online</span><span class="qf-desc">Online co-op/versus</span></button>
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Sort by</div>
+        <select class="ss" id="SORT">
+          <option value="alpha">A → Z</option>
+          <option value="alpha-d">Z → A</option>
+          <option value="mc-d">Metacritic ↓</option>
+          <option value="diff-a">Easiest first</option>
+          <option value="diff-d">Hardest first</option>
+          <option value="fav">⭐ Favorites first</option>
+          <option value="queue">▶ Queue first</option>
+          <option value="played-d">Recently played</option>
+          <option value="ses-a">Shortest sessions</option>
+          <option value="ses-d">Longest sessions</option>
+          <option value="star-d">★ My Rating ↓</option>
+        </select>
+      </div>
+      <div class="sb-sec"><div class="sb-lbl">Genre</div><div class="pills" id="PG"></div></div>
+      <div class="sb-sec"><div class="sb-lbl">Vibe</div><div class="pills" id="PM"></div></div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Multiplayer</div>
+        <div class="pills">
+          <button class="pill" data-f="mp" data-v="Local_Coop">🛋 Local Co-op</button>
+          <button class="pill" data-f="mp" data-v="Online_Coop">🌐 Online Co-op</button>
+          <button class="pill" data-f="mp" data-v="Local_Versus">🎮 Local Versus</button>
+          <button class="pill" data-f="mp" data-v="Online_Versus">⚔️ Online Versus</button>
+          <button class="pill" data-f="mp" data-v="Solo">🧍 Solo only</button>
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Difficulty</div>
+        <div class="pills">
+          <button class="pill" data-f="diff" data-v="1">😌 Very Easy</button>
+          <button class="pill" data-f="diff" data-v="2">🙂 Easy</button>
+          <button class="pill" data-f="diff" data-v="3">😐 Medium</button>
+          <button class="pill" data-f="diff" data-v="4">😤 Hard</button>
+          <button class="pill" data-f="diff" data-v="5">💀 Brutal</button>
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Session</div>
+        <div class="pills">
+          <button class="pill" data-f="ses" data-v="Quick">⚡ &lt;30 min</button>
+          <button class="pill" data-f="ses" data-v="Medium">🕐 30m–2h</button>
+          <button class="pill" data-f="ses" data-v="Long">🌙 2–5h</button>
+          <button class="pill" data-f="ses" data-v="Epic">🏔 5h+</button>
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Metacritic</div>
+        <div class="pills">
+          <button class="pill" data-f="mc" data-v="90">🏆 90+</button>
+          <button class="pill" data-f="mc" data-v="80">👍 80+</button>
+          <button class="pill" data-f="mc" data-v="70">✅ 70+</button>
+          <button class="pill" data-f="mc" data-v="na">— No score</button>
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">My Rating</div>
+        <div class="pills">
+          <button class="pill" data-f="star" data-v="rated">Rated</button>
+          <button class="pill" data-f="star" data-v="4">★ 4+</button>
+          <button class="pill" data-f="star" data-v="5">★★★★★</button>
+        </div>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">View</div>
+        <div class="vt">
+          <button class="vb on" id="VG" onclick="setView('grid')">▦ Grid</button>
+          <button class="vb" id="VL" onclick="setView('list')">≡ List</button>
+        </div>
+      </div>
+      <button class="clr" onclick="clearFilters()">✕ Clear all filters</button>
+    </aside>
+    <div class="main">
+      <div class="wizard-banner">
+        <div><div class="wb-title">🎯 Not sure what to play?</div><div class="wb-sub">Answer 3 quick questions and get a personalized pick.</div></div>
+        <button class="wb-btn" onclick="openWizard()">Find my game →</button>
+      </div>
+      <div class="rbar">
+        <div class="rc">Showing <b id="RC">0</b> games</div>
+        <div id="stale-w" class="stale-w" style="display:none">⚠️ Steam data may be outdated — click ⚙ Manage → Full Refresh</div>
+      </div>
+      <div class="scroll-area"><div class="gg" id="GC"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WIZARD -->
+<div class="mo" id="WIZ" onclick="if(event.target===this)closeWiz()">
+  <div class="mw"><button class="mx" onclick="closeWiz()">✕</button><div class="wiz-wrap" id="wiz-wrap"></div></div>
+</div>
+
+<!-- GAME DETAIL -->
+<div class="mo" id="MO" onclick="if(event.target===this)closeMO()">
+  <div class="mw"><div id="MC"></div></div>
+</div>
+
+<!-- RANDOM -->
+<div class="mo" id="RP" onclick="if(event.target===this)closeRP()">
+  <div class="mw"><button class="mx" onclick="closeRP()">✕</button><div class="spin-wrap" id="spin-content"></div></div>
+</div>
+
+<!-- QUEUE MODAL -->
+<div class="mo" id="QM" onclick="if(event.target===this)closeQM()">
+  <div class="mw" style="max-width:500px">
+    <button class="mx" onclick="closeQM()">✕</button>
+    <div style="padding:1.75rem">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:.25rem">▶ Play Queue</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:1.25rem">Games queued to play, in order added.</div>
+      <div id="qm-list"></div>
+      <div id="qm-empty" style="font-size:13px;color:var(--text3);font-style:italic;padding:1rem 0">No games in queue yet — click ▶ on any card to add one.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAVORITES MODAL -->
+<div class="mo" id="FM" onclick="if(event.target===this)closeFM()">
+  <div class="mw" style="max-width:500px">
+    <button class="mx" onclick="closeFM()">✕</button>
+    <div style="padding:1.75rem">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:.25rem">⭐ Favorites</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:1.25rem">Your starred games at a glance.</div>
+      <div id="fm-list"></div>
+      <div id="fm-empty" style="font-size:13px;color:var(--text3);font-style:italic;padding:1rem 0">No favorites yet — click ☆ on any card.</div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT -->
+<div class="ov" id="EM" onclick="if(event.target===this)closeOv('EM')">
+  <div class="ow">
+    <button class="mx" style="position:static;float:right;background:var(--bg4);border-color:var(--border)" onclick="closeOv('EM')">✕</button>
+    <h2>✏️ Edit Library</h2>
+    <p>One game title per line. New games will be resolved against Steam automatically.</p>
+    <textarea class="ow-ta" id="ETA" spellcheck="false"></textarea>
+    <div class="ow-tip">💡 Find App IDs in Steam store URLs: store.steampowered.com/app/<b>413150</b>/Stardew_Valley — they're faster and more accurate than names.</div>
+    <div class="ow-acts">
+      <button class="ow-btn" onclick="closeOv('EM')">Cancel</button>
+      <button class="ow-btn pri" onclick="saveEdit()">Save &amp; Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROOM SETUP -->
+<div class="mo" id="RS" onclick="if(event.target===this)closeRoomSetup()">
+  <div class="mw" style="max-width:420px">
+    <div class="rs-body">
+      <div class="rs-title">☁ Family Sync</div>
+      <div class="rs-sub">Create a new room for your family, or enter a code to join an existing one.</div>
+      <div class="rs-lbl">Room name</div>
+      <input class="pf-in" id="rs-name-in" placeholder="e.g. Smith Family" maxlength="30" style="width:100%;box-sizing:border-box;margin-bottom:.75rem">
+      <button class="mm-btn" style="width:100%;justify-content:center;padding:.5rem" onclick="fbCreateRoom()">Create room →</button>
+      <div class="rs-divider">or join an existing room</div>
+      <div class="rs-lbl">Room code</div>
+      <input class="pf-in" id="rs-code-in" placeholder="6-character code" maxlength="8" oninput="this.value=this.value.toUpperCase()" style="width:100%;box-sizing:border-box;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem">
+      <button class="mm-btn" style="width:100%;justify-content:center;padding:.5rem" onclick="fbJoinRoom()">Join room →</button>
+      <div style="text-align:center;margin-top:1rem">
+        <button onclick="closeRoomSetup()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:4px 8px">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGEMENT MENU -->
+<div class="mo" id="MM" onclick="if(event.target===this)closeMM()">
+  <div class="mw" style="max-width:520px">
+    <div class="mm-hdr">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px">⚙ Manage Library</div>
+        <div class="mm-status" id="mm-status"></div>
+      </div>
+      <button onclick="closeMM()" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--text2);width:28px;height:28px;cursor:pointer;font-size:14px;flex-shrink:0;transition:border-color .15s,color .15s;margin-left:1rem">✕</button>
+    </div>
+    <div class="mm-body">
+      <!-- API Keys -->
+      <div class="mm-sec">
+        <div class="mm-sec-lbl">🔑 API Keys</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Groq <span style="color:var(--text3)">(AI tagging)</span></div>
+            <input type="password" id="mm-akey" placeholder="gsk_… (leave blank to reuse saved key)" class="pf-in" style="font-family:monospace;font-size:11px;width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">RAWG <span style="color:var(--text3)">(Metacritic scores — optional)</span></div>
+            <input type="password" id="mm-rkey" placeholder="(leave blank to reuse saved key)" class="pf-in" style="font-family:monospace;font-size:11px;width:100%;box-sizing:border-box">
+          </div>
+        </div>
+      </div>
+      <!-- Refresh & Re-tag -->
+      <div class="mm-sec">
+        <div class="mm-sec-lbl">🔄 Refresh &amp; Re-tag</div>
+        <div class="mm-acts">
+          <div class="mm-act">
+            <div class="mm-act-info">
+              <div class="mm-act-title">↺ Full Refresh</div>
+              <div class="mm-act-desc">Re-fetch Steam &amp; RAWG data and tag new games. Manual edits are preserved.</div>
+            </div>
+            <button class="mm-btn" onclick="doRefresh()">Run ↺</button>
+          </div>
+          <div class="mm-act">
+            <div class="mm-act-info">
+              <div class="mm-act-title">⚡ Retry AI Only</div>
+              <div class="mm-act-desc">Re-tag games showing "?" genre. Faster — skips Steam and RAWG lookup.</div>
+            </div>
+            <button class="mm-btn" onclick="doRetryAiOnly()">Run ⚡</button>
+          </div>
+          <div class="mm-act">
+            <div class="mm-act-info">
+              <div class="mm-act-title">🤖 Force Re-tag All</div>
+              <div class="mm-act-desc">Re-run AI on every game regardless of existing tags. Useful after AI updates. Ratings, play logs, and manual edits are unaffected.</div>
+            </div>
+            <button class="mm-btn" onclick="doForceRetagAll()">Run 🤖</button>
+          </div>
+        </div>
+      </div>
+      <!-- Game list -->
+      <div class="mm-sec">
+        <div class="mm-sec-lbl">📝 Game List</div>
+        <div class="mm-act">
+          <div class="mm-act-info">
+            <div class="mm-act-title">Edit Game List</div>
+            <div class="mm-act-desc">Add or remove titles. Supports Steam App IDs and game names.</div>
+          </div>
+          <button class="mm-btn" onclick="closeMM();openEdit()">Open →</button>
+        </div>
+      </div>
+      <!-- Family Sync -->
+      <div class="mm-sec">
+        <div class="mm-sec-lbl">☁ Family Sync</div>
+        <div id="mm-sync-room">
+          <div class="mm-act">
+            <div class="mm-act-info">
+              <div class="mm-act-title">Sign in to sync</div>
+              <div class="mm-act-desc">Share your library, plays, and comments across devices with your family.</div>
+            </div>
+            <button class="mm-btn" onclick="fbLoad(function(){ fbInitAuth(); fbSignIn(); })">Sign in ☁</button>
+          </div>
+        </div>
+      </div>
+      <!-- Danger zone -->
+      <div class="mm-sec mm-danger">
+        <div class="mm-sec-lbl" style="color:#f87171">⚠ Danger Zone</div>
+        <div class="mm-act" style="background:rgba(232,85,85,.05)">
+          <div class="mm-act-info">
+            <div class="mm-act-title" style="color:#f87171">🗑 Clear Library</div>
+            <div class="mm-act-desc">Removes all games, play logs, comments, favourites, ratings, and tag edits. API keys are kept.</div>
+          </div>
+          <button class="mm-btn mm-btn-danger" onclick="clearLibrary()">Clear 🗑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="TOAST"></div>
+<!-- XLSX loaded on demand only when user imports a spreadsheet -->
+<script>
+function loadXlsx(cb){
+  if(window.XLSX){ cb(); return; }
+  var s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+  s.onload=cb;
+  s.onerror=function(){ obErr('Could not load spreadsheet parser. Check your internet connection.'); };
+  document.head.appendChild(s);
+}
+</script>
+<script>
+// ═══════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════
+var SK='gv6_games', TK='gv6_src', FK='gv6_favs', CK='gv6_cmts', QK='gv6_queue', PK='gv6_plays', TSK='gv6_ts', STARS_K='gv6_stars', OVERRIDES_K='gv6_overrides', RATINGS_K='gv6_ratings';
+
+function toggleSidebar(){
+  var sb=document.getElementById('SB');
+  var ov=document.getElementById('SBO');
+  if(!sb||!ov) return;
+  var isOpen=sb.classList.contains('open');
+  if(isOpen){sb.classList.remove('open');ov.classList.remove('open');}
+  else{sb.classList.add('open');ov.classList.add('open');}
+}
+function closeSidebar(){
+  var sb=document.getElementById('SB');
+  var ov=document.getElementById('SBO');
+  if(sb) sb.classList.remove('open');
+  if(ov) ov.classList.remove('open');
+}
+
+// Steam API: when opened as file://, browsers block the response (Steam omits CORS headers).
+// corsproxy.io is a free, reliable CORS proxy — it adds Access-Control-Allow-Origin:* and
+// passes the raw Steam JSON through unchanged, so our parsing code needs no changes.
+function steamApiUrl(id){
+  var direct='https://store.steampowered.com/api/appdetails?appids='+id+'&cc=us&l=en';
+  if(window.location.protocol==='file:'){
+    return 'https://corsproxy.io/?'+encodeURIComponent(direct);
+  }
+  return direct;
+}
+function imgUrl(id){ return 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/'+id+'/header.jpg'; }
+function imgFallback(id){ return 'https://cdn.cloudflare.steamstatic.com/steam/apps/'+id+'/header.jpg'; }
+
+var VIBES = [
+  {v:'Cozy',e:'🧸'},{v:'Tense',e:'😬'},{v:'Action',e:'💥'},{v:'Story',e:'📖'},
+  {v:'Mindless',e:'🧠'},{v:'Creative',e:'🎨'},{v:'Social',e:'🤣'},
+  {v:'Challenge',e:'🏆'},{v:'Chill',e:'😌'},{v:'Dark',e:'🌑'}
+];
+var VIBC = {};
+VIBES.forEach(function(x){ VIBC[x.v] = x.e; });
+
+var GS = {
+  Action:{bg:'rgba(248,113,113,.13)',c:'#f87171',b:'rgba(248,113,113,.25)'},
+  RPG:{bg:'rgba(167,139,250,.13)',c:'#a78bfa',b:'rgba(167,139,250,.25)'},
+  Horror:{bg:'rgba(100,116,139,.2)',c:'#94a3b8',b:'rgba(148,163,184,.18)'},
+  Puzzle:{bg:'rgba(34,211,238,.1)',c:'#22d3ee',b:'rgba(34,211,238,.2)'},
+  Strategy:{bg:'rgba(251,191,36,.1)',c:'#fbbf24',b:'rgba(251,191,36,.2)'},
+  Simulation:{bg:'rgba(45,212,191,.1)',c:'#2dd4bf',b:'rgba(45,212,191,.2)'},
+  Platformer:{bg:'rgba(74,222,128,.1)',c:'#4ade80',b:'rgba(74,222,128,.2)'},
+  Shooter:{bg:'rgba(251,146,60,.12)',c:'#fb923c',b:'rgba(251,146,60,.24)'},
+  Adventure:{bg:'rgba(108,141,250,.12)',c:'#6c8dfa',b:'rgba(108,141,250,.24)'},
+  Survival:{bg:'rgba(180,130,80,.2)',c:'#c4894a',b:'rgba(196,137,74,.26)'},
+  Fighting:{bg:'rgba(244,114,182,.12)',c:'#f472b6',b:'rgba(244,114,182,.24)'},
+  Management:{bg:'rgba(45,212,191,.08)',c:'#2dd4bf',b:'rgba(45,212,191,.16)'},
+  Visual_Novel:{bg:'rgba(196,181,253,.1)',c:'#c4b5fd',b:'rgba(196,181,253,.2)'},
+  Racing:{bg:'rgba(250,204,21,.11)',c:'#facc15',b:'rgba(250,204,21,.22)'}
+};
+function gst(k){ return GS[k] || {bg:'rgba(255,255,255,.05)',c:'#8b91a8',b:'rgba(255,255,255,.1)'}; }
+
+var SES_O = {Quick:1,Medium:2,Long:3,Epic:4};
+var DIFF_L = ['','Very Easy','Easy','Medium','Hard','Brutal'];
+var MP_L = {Solo:'🧍 Solo',Local_Coop:'🛋 Local Co-op',Online_Coop:'🌐 Online Co-op',Local_Versus:'🎮 Local Vs',Online_Versus:'⚔️ Online Vs'};
+
+var GAMES=[], GAMES_PURE=[], VIEW='grid', OPEN=null, AQF=null, _appList=null;
+var FAVS = JSON.parse(localStorage.getItem(FK)||'[]');
+var CMTS = JSON.parse(localStorage.getItem(CK)||'{}');
+var QUEUE = JSON.parse(localStorage.getItem(QK)||'[]');
+var PLAYS = JSON.parse(localStorage.getItem(PK)||'{}');
+var STARS = JSON.parse(localStorage.getItem(STARS_K)||'{}');
+var RATINGS = JSON.parse(localStorage.getItem(RATINGS_K)||'{}'); // { "Title": { uid1: 4, uid2: 5 } }
+var OVERRIDES = JSON.parse(localStorage.getItem(OVERRIDES_K)||'{}');
+var AF = {genre:[],vibe:[],mp:[],diff:[],ses:[],mc:[],star:[]};
+var OB_M='file', OB_T=[], OB_I=[];
+
+// ═══════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escQ(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function arraysEqual(a,b){
+  if((a||[]).length!==(b||[]).length) return false;
+  var as=(a||[]).slice().sort(), bs=(b||[]).slice().sort();
+  for(var i=0;i<as.length;i++) if(as[i]!==bs[i]) return false;
+  return true;
+}
+function applyOverrides(g){
+  var ov=OVERRIDES[g.title];
+  if(!ov||!ov.fields||!ov.fields.length) return g;
+  var r=Object.assign({},g);
+  ov.fields.forEach(function(f){ if(ov[f]!==undefined) r[f]=ov[f]; });
+  r._edited=true;
+  r._editedFields=ov.fields.slice();
+  return r;
+}
+function syncGames(){
+  GAMES=GAMES_PURE.map(applyOverrides);
+}
+function pGenre(g){ return (g.genres&&g.genres[0])||'?'; }
+function dcC(d){ return (d===null||d===undefined)?'var(--text3)':d<=1?'#3dcc78':d<=2?'#a3e635':d<=3?'#f5b731':d<=4?'#f07a3a':'#e85555'; }
+function mcC(s){ return !s?'var(--text3)':s>=80?'#3dcc78':s>=60?'#f5b731':'#e85555'; }
+function sE(s){ return {Quick:'⚡',Medium:'🕐',Long:'🌙',Epic:'🏔'}[s]||''; }
+function sesLabel(s){ return s?sE(s)+' '+s:'<span style="color:var(--text3)">?</span>'; }
+function dots(d,c){
+  var h='<div class="dd">';
+  for(var i=1;i<=5;i++) h+='<div class="dot'+(i<=d?' on':'')+'" style="color:'+c+'"></div>';
+  return h+'</div>';
+}
+function toast(msg,dur){
+  dur=dur||2600;
+  var t=document.getElementById('TOAST');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, dur);
+}
+function ps(pct,msg,sub,cnt){
+  document.getElementById('ps-bar').style.width=pct+'%';
+  if(msg) document.getElementById('ps-msg').textContent=msg;
+  if(sub!=null) document.getElementById('ps-sub').textContent=sub;
+  if(cnt!=null) document.getElementById('ps-count').textContent=cnt;
+}
+function plog(msg){
+  var el=document.getElementById('ps-log');
+  if(!el) return;
+  var d=document.createElement('div');
+  d.textContent=new Date().toLocaleTimeString()+' '+msg;
+  el.appendChild(d);
+  el.scrollTop=el.scrollHeight;
+  console.log('[GV]',msg);
+}
+
+// ═══════════════════════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════════════════════
+function selM(m){
+  OB_M=m; OB_T=[]; OB_I=[];
+  document.querySelectorAll('.ob-m').forEach(function(el){
+    el.classList.toggle('sel', el.dataset.m===m);
+  });
+  document.getElementById('ob-status').textContent='';
+  document.getElementById('ob-btn').disabled=true;
+  var a=document.getElementById('ob-area');
+  if(m==='file'){
+    a.innerHTML='<div class="ob-drop" id="ob-drop" onclick="document.getElementById(\'ob-fi\').click()" ondragover="event.preventDefault();this.classList.add(\'drag\')" ondragleave="this.classList.remove(\'drag\')" ondrop="obDrop(event)"><div class="ob-drop-icon">📂</div><div class="ob-drop-text">Drop your file here or click to browse</div><div class="ob-drop-hint">Excel (.xlsx/.xls), CSV, or plain text — one game per row</div></div><input type="file" id="ob-fi" accept=".xlsx,.xls,.csv,.txt" onchange="obFile(event)">';
+  } else if(m==='paste'){
+    a.innerHTML='<textarea class="ob-ta" id="ob-ta" placeholder="Stardew Valley&#10;Elden Ring&#10;It Takes Two&#10;Cyberpunk 2077&#10;…" oninput="obText()"></textarea>';
+  } else {
+    a.innerHTML='<textarea class="ob-ta" id="ob-ta" placeholder="413150&#10;1245620&#10;1426210&#10;1091500&#10;…" oninput="obText()"></textarea><div style="font-size:10px;color:var(--text3);margin-top:6px">Find App IDs in Steam store URLs:<br><code style="color:var(--accent)">store.steampowered.com/app/<b>413150</b>/Stardew_Valley</code></div>';
+  }
+}
+function obDrop(e){
+  e.preventDefault();
+  document.getElementById('ob-drop').classList.remove('drag');
+  var f=e.dataTransfer.files[0];
+  if(f) obFile2(f);
+}
+function obFile(e){ if(e.target.files[0]) obFile2(e.target.files[0]); }
+function obFile2(f){
+  var ext=f.name.split('.').pop().toLowerCase();
+  if(ext==='xlsx'||ext==='xls'){
+    var r=new FileReader();
+    r.onload=function(e){
+      loadXlsx(function(){
+        try{
+          var wb=XLSX.read(e.target.result,{type:'array'});
+          var ws=wb.Sheets[wb.SheetNames[0]];
+          var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+          obProcessRows(rows);
+        }catch(err){ obErr('Could not read file: '+err.message); }
+      });
+    };
+    r.readAsArrayBuffer(f);
+  } else {
+    var r2=new FileReader();
+    r2.onload=function(e){ obProcessRows(e.target.result.split(/\r?\n/).map(function(l){ return [l]; })); };
+    r2.readAsText(f);
+  }
+}
+function obProcessRows(rows){
+  // Two-column detection: if majority of rows are [Name, 5-8 digit number] or [number, Name],
+  // read both columns as paired title+appid (skips ALL name lookup, perfect images guaranteed)
+  var thenId=0, idThen=0;
+  var multiRows=rows.filter(function(r){ return Array.isArray(r)&&r.length>=2&&String(r[0]||'').trim(); });
+  multiRows.forEach(function(r){
+    var c0=String(r[0]||'').trim(), c1=String(r[1]||'').trim();
+    if(!/^\d+$/.test(c0)&&/^\d{5,8}$/.test(c1)) thenId++;
+    else if(/^\d{5,8}$/.test(c0)&&!/^\d+$/.test(c1)) idThen++;
+  });
+  if(multiRows.length>2&&(thenId/multiRows.length>0.6||idThen/multiRows.length>0.6)){
+    var nameFirst=thenId>=idThen;
+    var titleVals=[], idVals=[];
+    multiRows.forEach(function(r){
+      var c0=String(r[0]||'').trim(), c1=String(r[1]||'').trim();
+      var t=nameFirst?c0:c1, idStr=nameFirst?c1:c0;
+      if(t&&/^\d{5,8}$/.test(idStr)&&!/^\d+$/.test(t)){ titleVals.push(t); idVals.push(parseInt(idStr)); }
+    });
+    if(titleVals.length&&titleVals.length===idVals.length){
+      OB_T=titleVals; OB_I=idVals;
+      obOk('✓ '+titleVals.length+' games — Name + App ID columns detected (no lookup needed!)');
+      return;
+    }
+  }
+  // Single-column fallback
+  var vals=[];
+  rows.forEach(function(r){
+    var cell=Array.isArray(r)?r[0]:r;
+    var v=String(cell||'').trim();
+    if(v) vals.push(v);
+  });
+  var nums=vals.filter(function(v){ return /^\d+$/.test(v); }).length;
+  if(nums/vals.length>0.8){
+    OB_I=vals.filter(function(v){ return /^\d+$/.test(v); }).map(Number);
+    OB_T=[];
+    obOk('✓ '+OB_I.length+' App IDs found');
+  } else {
+    OB_T=vals; OB_I=[];
+    obOk('✓ '+OB_T.length+' games found');
+  }
+}
+function obText(){
+  var lines=document.getElementById('ob-ta').value.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  if(OB_M==='ids'){
+    OB_I=lines.filter(function(l){ return /^\d+$/.test(l); }).map(Number);
+    OB_T=[];
+    obOk(OB_I.length?'✓ '+OB_I.length+' App IDs':'');
+  } else {
+    OB_T=lines; OB_I=[];
+    obOk(lines.length?'✓ '+lines.length+' games':'');
+  }
+}
+function obOk(m){
+  var s=document.getElementById('ob-status');
+  s.className='ob-status ok'; s.textContent=m;
+  document.getElementById('ob-btn').disabled=!m;
+}
+function obErr(m){
+  var s=document.getElementById('ob-status');
+  s.className='ob-status err'; s.textContent=m;
+  document.getElementById('ob-btn').disabled=true;
+}
+function startImport(){
+  var keyEl=document.getElementById('ob-akey');
+  var key=keyEl?keyEl.value.trim():'';
+  if(key) localStorage.setItem('gv6_akey',key);
+  var rkeyEl=document.getElementById('ob-rkey');
+  var rkey=rkeyEl?rkeyEl.value.trim():'';
+  if(rkey) localStorage.setItem(RAWG_SK,rkey);
+  showPS();
+  buildLibrary(OB_T.length?OB_T:null, OB_I.length?OB_I:null, false);
+}
+
+// ═══════════════════════════════════════════════════
+//  STEAM DATA
+// ═══════════════════════════════════════════════════
+function fetchWithTimeout(url, ms, opts){
+  ms = ms||10000;
+  var timeoutP = new Promise(function(_,reject){
+    setTimeout(function(){ reject(new Error('Timed out after '+ms+'ms')); }, ms);
+  });
+  return Promise.race([fetch(url, opts||undefined), timeoutP]);
+}
+
+// ─── Dynamic Steam App ID resolution ────────────────
+// Fetches Steam's full app list (~170k games) instead of a hardcoded table.
+// Works for any Steam library — no per-game knowledge required.
+// RAWG stores endpoint then double-checks the resolved IDs (see resolveAppIdsViaRawg).
+function resolveIds(titles){
+  ps(15,'Resolving game names...','Downloading Steam app list...',null);
+
+  // Normalise a title: lowercase, strip symbols/punctuation, collapse spaces.
+  // Uses char-code ranges — zero non-ASCII characters in source, no encoding risk.
+  function norm(s){
+    var o=(s||'').toLowerCase(), r='', c;
+    for(var i=0;i<o.length;i++){
+      c=o.charCodeAt(i);
+      if(c>=8216&&c<=8222) continue; // curly quotes U+2018-U+201E
+      if(c===699||c===700) continue;  // modifier-letter apostrophes
+      if(c===8482||c===174||c===169) continue; // TM, R, C symbols
+      if(c===58||c===33||c===63||c===39||c===34||c===46||c===44||c===45) continue; // : ! ? ' “ . , -
+      r+=o[i];
+    }
+    return r.replace(/\s+/g,' ').trim();
+  }
+
+  var listUrl='https://api.steampowered.com/ISteamApps/GetAppList/v2/';
+  if(window.location.protocol==='file:')
+    listUrl='https://corsproxy.io/?'+encodeURIComponent(listUrl);
+
+  return fetchWithTimeout(listUrl, 30000)
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    })
+    .then(function(d){
+      var apps=(d&&d.applist&&d.applist.apps)||[];
+      if(!apps.length) throw new Error('empty list');
+      plog('Steam app list: '+apps.length.toLocaleString()+' entries — matching titles…');
+
+      // Build lookup maps.
+      // exactMap:   original name   → appid
+      // normMap:    norm(name)      → appid
+      // firstWord:  first norm-word → [{normName, appid}]  (for fast fuzzy search)
+      // Lower app IDs = older / original game in a series — first entry wins for ties.
+      var exactMap={}, normMap={}, firstWord={};
+      for(var i=0;i<apps.length;i++){
+        var a=apps[i];
+        if(!a.name||!a.appid) continue;
+        if(!exactMap[a.name]) exactMap[a.name]=a.appid;
+        var nn=norm(a.name);
+        if(nn&&!normMap[nn]){
+          normMap[nn]=a.appid;
+          // Index by first word for fast fuzzy lookup
+          var fw=nn.split(' ')[0];
+          if(fw&&fw.length>1){
+            if(!firstWord[fw]) firstWord[fw]=[];
+            firstWord[fw].push({n:nn,id:a.appid});
+          }
+        }
+      }
+
+      var fuzzyLog=[];
+      var out=titles.map(function(t){
+        // 1. Exact match
+        var id=exactMap[t];
+        if(id) return {title:t,appid:id};
+        // 2. Normalised match (handles ™/®/case/punctuation variants)
+        var nt=norm(t);
+        id=normMap[nt];
+        if(id) return {title:t,appid:id};
+        // 3. normTitle match (also converts Roman numerals: “III”→”3”)
+        var ntt=normTitle(t);
+        id=normMap[ntt];
+        if(id) return {title:t,appid:id};
+        // 4. Fuzzy substring — only search games sharing the same first word
+        //    (avoids O(n×170k) iteration that would freeze the browser)
+        if(nt.length<5) return {title:t,appid:null};
+        var fw=nt.split(' ')[0];
+        var candidates=firstWord[fw]||[];
+        var fuzzyId=null, fuzzyKey=null;
+        for(var ci=0;ci<candidates.length;ci++){
+          var cn=candidates[ci].n;
+          if(cn.length>4&&(cn.indexOf(nt)>-1||nt.indexOf(cn)>-1)){
+            fuzzyId=candidates[ci].id; fuzzyKey=cn; break;
+          }
+        }
+        if(fuzzyId){
+          fuzzyLog.push('”'+t+'” → '+fuzzyId+' via fuzzy (“'+fuzzyKey+'”)');
+          return {title:t,appid:fuzzyId,_fuzzy:true};
+        }
+        return {title:t,appid:null};
+      });
+
+      var matched=out.filter(function(r){ return r.appid; }).length;
+      plog('Resolved '+matched+'/'+titles.length+' games to App IDs'
+        +(fuzzyLog.length?' ('+fuzzyLog.length+' fuzzy)':''));
+      if(fuzzyLog.length){
+        plog('⚠ Fuzzy matches — RAWG stores will verify these:');
+        fuzzyLog.forEach(function(m){ plog('  '+m); console.warn('[GV] FUZZY:',m); });
+      }
+      if(matched<titles.length){
+        var missed=out.filter(function(r){return !r.appid;}).map(function(r){return r.title;});
+        plog('No Steam ID for: '+missed.slice(0,5).join(', ')+(missed.length>5?' + '+(missed.length-5)+' more':'')
+          +' — RAWG stores will attempt to resolve');
+      }
+      return out;
+    })
+    .catch(function(e){
+      // If Steam app list is unavailable, proceed with null IDs — RAWG stores resolves them
+      plog('⚠ Steam app list unavailable ('+e.message+') — app IDs will come from RAWG stores');
+      console.warn('[GV] Steam app list error:',e);
+      return titles.map(function(t){ return {title:t,appid:null}; });
+    });
+}
+
+
+function fetchSteamData(ids){
+  var out={};
+  var done=0;
+  var valid=ids.filter(Boolean);
+  plog('Fetching Steam store data for '+valid.length+' games…');
+
+  // 3 concurrent requests per batch — Steam rate-limits aggressive bursts
+  // 600 ms gap between batches keeps total rate ~3 req/s, well within Steam's tolerance
+  var BATCH=3;
+  var batches=[];
+  var firstSteamErr=null;
+  if(window.location.protocol==='file:') plog('Note: running as local file — Steam API routed via corsproxy.io');
+  for(var i=0;i<valid.length;i+=BATCH){ batches.push(valid.slice(i,i+BATCH)); }
+
+  return batches.reduce(function(chain, batch){
+    return chain.then(function(){
+      return Promise.all(batch.map(function(id){
+        return fetchWithTimeout(steamApiUrl(id), 10000)
+          .then(function(r){
+            if(!r.ok){
+              // Steam returned a non-2xx (e.g. 429 rate limit, 403 block)
+              if(!firstSteamErr){ firstSteamErr=r.status; }
+              console.warn('[GV] Steam HTTP '+r.status+' for app '+id);
+              done++; return;
+            }
+            return r.json().then(function(d){
+              if(d&&d[id]&&d[id].success===true){ out[id]=d[id].data; }
+              else { console.warn('[GV] Steam success:false for app '+id, JSON.stringify(d||{}).slice(0,80)); }
+              done++;
+            });
+          })
+          .catch(function(e){
+            if(!firstSteamErr){ firstSteamErr=e.message; }
+            console.warn('[GV] Steam fetch error app '+id+':', e.message);
+            done++;
+          });
+      })).then(function(){
+        ps(28+Math.round(done/valid.length*30), 'Fetching Steam data… ('+done+'/'+valid.length+')', 'Images, scores, descriptions', done+'/'+valid.length);
+        return sleep(600);
+      });
+    });
+  }, Promise.resolve()).then(function(){
+    var got=Object.keys(out).length;
+    var withMC=Object.keys(out).filter(function(id){ return out[id]&&out[id].metacritic&&out[id].metacritic.score; }).length;
+    plog('Steam data: '+got+'/'+valid.length+' fetched, '+withMC+' with Metacritic scores');
+    console.log('[GV] Metacritic raw check: '+withMC+'/'+got+' games have MC score in Steam response');
+    if(got===0){
+      var errHint = firstSteamErr
+        ? (typeof firstSteamErr==='number'
+            ? '⚠ Steam returned HTTP '+firstSteamErr+(firstSteamErr===429?' (rate limited — wait ~5 min and retry)':firstSteamErr===403?' (blocked)':'')
+            : '⚠ Steam fetch error: '+firstSteamErr+' (check browser console for details)')
+        : '⚠ Zero games fetched — Steam API may be unreachable from this browser';
+      plog(errHint);
+    }
+    return out;
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  RAWG API — official Metacritic scores
+//  Free at rawg.io/apidocs · 100k requests/month · full CORS support
+//  Stored key: gv6_rkey
+// ═══════════════════════════════════════════════════
+var RAWG_SK='gv6_rkey';
+
+// ─── Title normalisation helpers ────────────────────
+// Used by both RAWG search ranking and AI title matching.
+// Strips punctuation, expands Roman numerals → Arabic, lowercases.
+function normTitle(t){
+  return (t||'').toLowerCase()
+    .replace(/'/g,'')            // apostrophes: "Wake's" → "Wakes"
+    .replace(/[:\-–—]/g,' ')     // colons/dashes → space
+    .replace(/\bxiii\b/g,'13').replace(/\bxii\b/g,'12').replace(/\bxi\b/g,'11')
+    .replace(/\bviii\b/g,'8').replace(/\bvii\b/g,'7').replace(/\bvi\b/g,'6')
+    .replace(/\biv\b/g,'4').replace(/\bix\b/g,'9')
+    .replace(/\biii\b/g,'3').replace(/\bii\b/g,'2')
+    .replace(/\bv(\d+)\b/g,'$1') // "V2" → "2", "V3" → "3" (version numbers)
+    .replace(/[^a-z0-9 ]/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+// Jaccard word-overlap similarity (0 = no overlap, 1 = identical after normalisation)
+// Key rules:
+//   • Single-digit numbers are kept (so "4" in "Sniper Elite 4" counts as a word)
+//   • If both titles have a number and the numbers differ → near-certain series mismatch (0.1)
+//   • If only the RAWG result has a number (search title doesn't) → 50% confidence penalty
+//     prevents "Sniper Elite" accidentally matching "Sniper Elite 4"
+function titleJaccard(a,b){
+  var na=normTitle(a), nb=normTitle(b);
+  if(na===nb) return 1;
+  // Series number check
+  var mA=na.match(/\b(\d+)\b/), mB=nb.match(/\b(\d+)\b/);
+  var nA=mA?parseInt(mA[1]):null, nB=mB?parseInt(mB[1]):null;
+  if(nA!==null&&nB!==null&&nA!==nB) return 0.1; // "Sniper Elite 3" vs "Sniper Elite 4" → reject
+  // Keep single-digit numbers as words (e.g. "4" in "Sniper Elite 4")
+  var wa=na.split(' ').filter(function(w){ return w.length>1||/^\d$/.test(w); });
+  var wb=nb.split(' ').filter(function(w){ return w.length>1||/^\d$/.test(w); });
+  if(!wa.length||!wb.length) return 0;
+  var common=wa.filter(function(w){ return wb.indexOf(w)>-1; }).length;
+  var unionSize=wa.length+wb.length-common;
+  var sim=unionSize>0?common/unionSize:0;
+  if(nA===null&&nB!==null) sim*=0.5; // search has no number, result does → half-confidence
+  return sim;
+}
+
+function fetchRawgData(titles){
+  var apiKey=localStorage.getItem(RAWG_SK)||'';
+  if(!apiKey) return Promise.resolve({});
+  plog('Fetching Metacritic scores from RAWG for '+titles.length+' games…');
+  var out={};
+  var done=0;
+  var BATCH=5; // 5 concurrent; RAWG has no documented RPM limit
+  var batches=[];
+  for(var i=0;i<titles.length;i+=BATCH) batches.push(titles.slice(i,i+BATCH));
+
+  return batches.reduce(function(chain,batch){
+    return chain.then(function(){
+      return Promise.all(batch.map(function(title){
+        var url='https://api.rawg.io/api/games?key='+encodeURIComponent(apiKey)
+          +'&search='+encodeURIComponent(title)+'&page_size=3&platforms=4';
+        return fetchWithTimeout(url,10000)
+          .then(function(r){
+            if(!r.ok){ console.warn('[GV] RAWG HTTP '+r.status+' for "'+title+'"'); done++; return; }
+            return r.json().then(function(d){
+              if(d&&d.results&&d.results.length){
+                // Score all results by Jaccard title similarity — pick highest
+                var best=null, bestSim=0;
+                for(var ri=0;ri<d.results.length;ri++){
+                  var sim=titleJaccard(title, d.results[ri].name||'');
+                  if(sim>bestSim){ bestSim=sim; best=d.results[ri]; }
+                }
+                // Require at least 55% word overlap — no blind fallback to results[0]
+                // This prevents e.g. "Sniper Elite" matching "Sniper Elite 4" and corrupting App IDs
+                if(bestSim<0.55){
+                  console.log('[GV] RAWG low-confidence match for "'+title+'" — best: "'+(best?best.name:'none')+'" (sim='+bestSim.toFixed(2)+') — skipped');
+                  best=null;
+                }
+                if(best){
+                  out[title]={rawgId:best.id, sim:bestSim};
+                  if(best.metacritic) out[title].metacritic=best.metacritic;
+                  if(best.background_image) out[title].image=best.background_image;
+                }
+              }
+              done++;
+            });
+          })
+          .catch(function(e){ console.warn('[GV] RAWG error for "'+title+'":', e.message); done++; });
+      })).then(function(){
+        ps(92+Math.round(done/titles.length*3),null,'Metacritic scores '+done+'/'+titles.length,done+'/'+titles.length);
+        return sleep(300);
+      });
+    });
+  },Promise.resolve()).then(function(){
+    var matched=Object.keys(out).length;
+    var withMc=Object.keys(out).filter(function(k){ return out[k].metacritic; }).length;
+    var withImg=Object.keys(out).filter(function(k){ return out[k].image; }).length;
+    var skipped=titles.length-matched;
+    plog('RAWG: '+matched+'/'+titles.length+' matched'+(skipped?' ('+skipped+' low-confidence — skipped)':''));
+    plog('RAWG: '+withMc+' Metacritic scores (PC) · '+withImg+'/'+matched+' game images');
+    if(skipped) plog('  → Skipped games will use Steam CDN image / no Metacritic score');
+    return out;
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  RAWG APP ID VERIFICATION
+//  For games that were fuzzy-matched or unresolved, call /games/{rawgId}/stores
+//  to get the real Steam store URL and extract the correct App ID from it.
+//  Store IDs in RAWG: 1 = Steam
+// ═══════════════════════════════════════════════════
+function resolveAppIdsViaRawg(merged, rawgData, apiKey){
+  var targets=merged.filter(function(g){
+    var rd=rawgData[g.title];
+    if(!rd||!rd.rawgId) return false;
+    // Always verify: fuzzy matches, no appid, OR any game where RAWG matched with high confidence
+    // (sim >= 0.8 catches wrong KNOWN_APPIDS entries that aren't flagged fuzzy)
+    return g._fuzzy || !g.appid || rd.sim>=0.8;
+  });
+  if(!targets.length) return Promise.resolve(0);
+  var fuzzyCount=targets.filter(function(g){ return g._fuzzy||!g.appid; }).length;
+  var checkCount=targets.length-fuzzyCount;
+  plog('Verifying Steam App IDs via RAWG for '+targets.length+' games'+(checkCount?' ('+fuzzyCount+' uncertain + '+checkCount+' double-checking)':' (all uncertain)')+'…');
+  var fixed=0;
+  var BATCH=5;
+  var batches=[];
+  for(var i=0;i<targets.length;i+=BATCH) batches.push(targets.slice(i,i+BATCH));
+
+  return batches.reduce(function(chain,batch){
+    return chain.then(function(){
+      return Promise.all(batch.map(function(g){
+        var rawgId=rawgData[g.title].rawgId;
+        var url='https://api.rawg.io/api/games/'+rawgId+'/stores?key='+encodeURIComponent(apiKey);
+        return fetchWithTimeout(url,10000)
+          .then(function(r){
+            if(!r.ok) return;
+            return r.json().then(function(d){
+              if(!d||!d.results) return;
+              for(var i=0;i<d.results.length;i++){
+                if(d.results[i].store_id===1){ // 1 = Steam
+                  var storeUrl=d.results[i].url||'';
+                  var m=storeUrl.match(/\/app\/(\d+)/);
+                  if(m){
+                    var newId=parseInt(m[1]);
+                    if(newId!==g.appid){
+                      plog('  ✓ '+(g._fuzzy?'Fixed fuzzy':'Corrected')+' "'+g.title+'" '+g.appid+' → '+newId);
+                      console.log('[GV] App ID corrected "'+g.title+'": '+g.appid+' → '+newId+(g._fuzzy?' (was fuzzy)':' (was in table)'));
+                    }
+                    g.appid=newId;
+                    g._fuzzy=false; // no longer uncertain
+                    fixed++;
+                  }
+                  break;
+                }
+              }
+            });
+          })
+          .catch(function(e){ console.warn('[GV] RAWG stores error for "'+g.title+'":', e.message); });
+      })).then(function(){ return sleep(200); });
+    });
+  },Promise.resolve()).then(function(){
+    plog('RAWG App ID verification: '+fixed+'/'+targets.length+' resolved or corrected');
+    return fixed;
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  AI ANALYSIS
+// ═══════════════════════════════════════════════════
+function aiAnalyze(games, _retry){
+  _retry = _retry||0;
+  var items=games.map(function(g){
+    var sg=(g.steamGenres||[]).join('/');
+    return g.title+(sg?' ['+sg+']':'');
+  }).join(', ');
+  var vibeList=VIBES.map(function(v){ return v.v; }).join(',');
+  var prompt='You are a precise gaming database. Return ONLY a raw JSON array — no markdown, no preamble.\n'
+    +'Each object needs ALL fields with ACCURATE values specific to THAT game (not generic defaults).\n'
+    +'Fields:\n'
+    +'- "title": exact string as given\n'
+    +'- "genres": array of 1-3 genres, best-fitting FIRST: Action,RPG,Horror,Puzzle,Strategy,Simulation,Platformer,Shooter,Adventure,Survival,Fighting,Management,Visual_Novel,Racing\n'
+    +'- "subgenre": 2-3 specific words describing the gameplay loop\n'
+    +'- "vibes": 1-3 from ['+vibeList+'] — how it FEELS to play\n'
+    +'- "mp": [Solo,Local_Coop,Online_Coop,Local_Versus,Online_Versus]. Solo ONLY if zero multiplayer.\n'
+    +'- "difficulty": 1-5. 1=child-friendly. 2=casual. 3=average gamer. 4=challenging. 5=punishing(souls-like). BE VARIED.\n'
+    +'- "sessionLength": Quick(<30min/run),Medium(30m-2h),Long(2-5h),Epic(5h+ open world). Roguelikes=Quick.\n'
+    +'- "playReason": max 12 words, SPECIFIC to this game\n'
+    +'\nCalibration (expected variety — every game should differ):\n'
+    +'Stardew Valley -> ["Simulation","RPG"], [Cozy,Creative], [Solo,Local_Coop,Online_Coop], diff=1, Epic\n'
+    +'ELDEN RING -> ["Action","RPG"], [Challenge,Dark], [Solo,Online_Coop,Online_Versus], diff=5, Epic\n'
+    +'Brotato -> ["Shooter","Action"], [Action,Mindless], [Solo], diff=3, Quick\n'
+    +'Lethal Company -> ["Horror"], [Social,Tense], [Online_Coop], diff=3, Medium\n'
+    +'Overcooked! 2 -> ["Simulation"], [Social,Action], [Local_Coop,Online_Coop], diff=3, Quick\n'
+    +'Mini Motorways -> ["Puzzle"], [Chill,Creative], [Solo], diff=2, Quick\n'
+    +'Divinity Original Sin 2 -> ["RPG","Strategy"], [Story,Creative], [Solo,Online_Coop,Local_Coop], diff=4, Epic\n'
+    +'\nNow produce ACCURATE varied data for these games:\n'
+    +'Games: '+items;
+
+  var logThisChunk = !aiAnalyze._logged;
+  var apiKey = localStorage.getItem('gv6_akey')||'';
+  if(!apiKey){
+    plog('⚠ No Groq API key — AI tagging skipped. Enter key at import screen or Refresh dialog.');
+    return Promise.resolve(null);
+  }
+  // Groq API — free tier: 30 RPM / 14,400 RPD / fast LLaMA-3 inference
+  // Key format: gsk_... (get free at console.groq.com/keys)
+  // Standard OpenAI-compatible endpoint, full CORS support including file:// origins
+  if(_retry>0) plog('⏳ Groq retry '+_retry+'/2 for this chunk…');
+  return fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', 45000, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      messages:[{role:'user',content:prompt}],
+      temperature:0.2,
+      max_tokens:8192
+    })
+  })
+  .then(function(r){
+    if(r.status===429){
+      if(_retry<2){
+        // Groq returns Retry-After (seconds) and x-ratelimit-reset-tokens — use whichever is larger
+        var ra=r.headers&&r.headers.get?parseInt(r.headers.get('retry-after')||'0'):0;
+        var waitSec=ra>0?ra+3:65; // default 65s covers a full 60s token-rate window
+        plog('⏳ Groq rate limited — waiting '+waitSec+'s then retrying ('+(_retry+1)+'/2)…');
+        return sleep(waitSec*1000).then(function(){ return aiAnalyze(games,_retry+1); });
+      }
+      plog('⚠ Groq rate limit persists — chunk skipped. Wait a few minutes then use Refresh.');
+      return null;
+    }
+    if(!r.ok){
+      var hint=r.status===401?' — invalid key (should start with gsk_)':r.status===403?' — key not authorised':'';
+      plog('⚠ Groq HTTP '+r.status+hint);
+      return null;
+    }
+    return r.json().then(function(d){
+      if(!d||!d.choices||!d.choices[0]||!d.choices[0].message||!d.choices[0].message.content){
+        plog('⚠ Groq response error: unexpected shape');
+        console.log('[GV] Groq bad response:', JSON.stringify(d).slice(0,600));
+        return null;
+      }
+      var raw=d.choices[0].message.content.trim();
+      if(logThisChunk){ aiAnalyze._logged=true; console.log('[GV] Groq raw response (chunk 1):', raw.slice(0,600)); }
+      raw=raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+      var s=raw.indexOf('['), e=raw.lastIndexOf(']');
+      if(s>-1&&e>-1) raw=raw.slice(s,e+1);
+      try{
+        return JSON.parse(raw);
+      }catch(pe){
+        plog('⚠ Groq JSON parse error: '+pe.message);
+        console.log('[GV] Groq parse-failed text:', raw.slice(0,400));
+        return null;
+      }
+    });
+  })
+  .catch(function(e){ plog('⚠ Groq error: '+e.message); console.log('[GV] Groq fetch error:', e); return null; });
+}
+
+// ═══════════════════════════════════════════════════
+//  BUILD LIBRARY
+// ═══════════════════════════════════════════════════
+function buildLibrary(titles, appids, force){
+  // Snapshot existing tags before clearing — used below to preserve stable/edited tags on refresh
+  var oldGamesMap={};
+  try{
+    var _old=localStorage.getItem(SK);
+    if(_old) JSON.parse(_old).forEach(function(g){ if(g.title) oldGamesMap[g.title]=g; });
+  }catch(ex){}
+
+  // DO NOT clear localStorage here — if the browser is refreshed mid-build the old data
+  // would be permanently lost. New data overwrites at the end when it's ready.
+  GAMES = [];
+  aiAnalyze._logged = false; // Reset chunk logging so first chunk is always logged
+  showPS();
+  plog('Starting import: '+(titles?titles.length:appids?appids.length:0)+' games');
+
+  var resolveStep;
+  if(titles&&titles.length&&appids&&appids.length&&titles.length===appids.length){
+    // Paired mode: Excel had both Name + AppID columns — perfect match, no lookup needed
+    plog('Using '+titles.length+' paired title + App ID entries — skipping all name lookup');
+    ps(26,'Name + App ID pairs detected — skipping name resolution…');
+    resolveStep=Promise.resolve(titles.map(function(t,i){ return {title:t, appid:appids[i]||null}; }));
+  } else if(appids&&appids.length){
+    plog('Using '+appids.length+' App IDs directly (no titles)');
+    ps(26,'App IDs provided — skipping name resolution…');
+    resolveStep=Promise.resolve(appids.map(function(id){ return {title:String(id),appid:id}; }));
+  } else {
+    resolveStep=resolveIds(titles);
+  }
+
+  var resolved, steamData;
+
+  resolveStep
+  .then(function(r){
+    resolved=r;
+    localStorage.setItem(TK, JSON.stringify({titles:titles,appids:appids}));
+    var ids=resolved.map(function(x){ return x.appid; }).filter(Boolean);
+    plog('Fetching Steam data for '+ids.length+' App IDs');
+    return fetchSteamData(ids);
+  })
+  .then(function(sd){
+    steamData=sd;
+    // Merge Steam data into game objects
+    var merged=resolved.map(function(r){
+      var s=r.appid?sd[r.appid]:null;
+      // Only use Steam API's header_image when the API actually responded (file:// blocks it)
+      // Steam CDN URL is constructed live in mkImgTag from g.appid so it reflects any later corrections
+      var headerImg=s?s.header_image:null;
+      // metacritic is an object {score, url} — extract score
+      var mc=null;
+      if(s&&s.metacritic){
+        mc=(typeof s.metacritic==='object')?s.metacritic.score:s.metacritic;
+      }
+      // Derive multiplayer tags from Steam categories — reliable fallback when AI is unavailable
+      // Steam category descriptions: "Online Co-op", "Local Co-op", "Co-op", "Online PvP", "Local PvP"
+      var steamMp=[];
+      (s&&s.categories||[]).forEach(function(c){
+        var d=(c.description||'').toLowerCase();
+        if(d.indexOf('online co-op')>-1){ if(steamMp.indexOf('Online_Coop')===-1) steamMp.push('Online_Coop'); }
+        else if(d.indexOf('local co-op')>-1||d.indexOf('split screen co-op')>-1){ if(steamMp.indexOf('Local_Coop')===-1) steamMp.push('Local_Coop'); }
+        else if(d.indexOf('co-op')>-1||d.indexOf('co op')>-1){ if(steamMp.indexOf('Online_Coop')===-1) steamMp.push('Online_Coop'); }
+        if(d.indexOf('online pvp')>-1||d.indexOf('online versus')>-1){ if(steamMp.indexOf('Online_Versus')===-1) steamMp.push('Online_Versus'); }
+        if(d.indexOf('local pvp')>-1||d.indexOf('lan pvp')>-1||d.indexOf('split screen versus')>-1){ if(steamMp.indexOf('Local_Versus')===-1) steamMp.push('Local_Versus'); }
+      });
+      if(!steamMp.length){
+        var hasMulti=s&&(s.categories||[]).some(function(c){ return (c.description||'').toLowerCase().indexOf('multi-player')>-1; });
+        if(!hasMulti) steamMp=['Solo'];
+      }
+      return {
+        title:s?s.name:r.title,
+        appid:r.appid||null,
+        _fuzzy:r._fuzzy||false,   // true = app ID came from fuzzy match, needs RAWG verification
+        headerImg:headerImg,
+        steamDesc:(s&&s.short_description)||'',
+        steamGenres:s?((s.genres||[]).map(function(g){ return g.description; })):[],
+        metacritic:mc,
+        developer:(s&&s.developers&&s.developers[0])||'',
+        releaseDate:(s&&s.release_date&&s.release_date.date)||'',
+        steamMp:steamMp,
+        genres:[],subgenre:null,vibes:[],mp:[],difficulty:3,sessionLength:'Medium',playReason:''
+      };
+    });
+
+    var withImg=merged.filter(function(g){ return g.headerImg; }).length;
+    var withMC=merged.filter(function(g){ return g.metacritic; }).length;
+    plog('Steam enrichment: '+withImg+' images, '+withMC+' Metacritic scores');
+
+    // RAWG — official Metacritic scores (works from file://, has CORS headers)
+    ps(58,'Fetching Metacritic scores…');
+    return fetchRawgData(merged.map(function(g){ return g.title; })).then(function(rawgData){
+      // Merge RAWG data: metacritic (PC score) + image fallback
+      var rawgImgs=0;
+      merged.forEach(function(g){
+        var rg=rawgData[g.title];
+        if(!rg) return;
+        if(rg.metacritic) g.metacritic=rg.metacritic; // always prefer PC score from RAWG
+        if(rg.image){ g.rawgImage=rg.image; if(!g.appid) rawgImgs++; } // store for ALL games; imgErr uses it when Steam CDN 404s
+      });
+      var totalMC=merged.filter(function(g){ return g.metacritic; }).length;
+      var withRawgImg=merged.filter(function(g){ return g.rawgImage; }).length;
+      if(Object.keys(rawgData).length) plog('RAWG: '+totalMC+' Metacritic scores (PC) · '+withRawgImg+'/'+merged.length+' game images');
+
+      // Verify / fix App IDs for fuzzy-matched and unresolved games via RAWG stores endpoint
+      var rawgApiKey=localStorage.getItem(RAWG_SK)||'';
+      var verifyStep=rawgApiKey
+        ? resolveAppIdsViaRawg(merged,rawgData,rawgApiKey)
+        : Promise.resolve(0);
+
+      return verifyStep.then(function(){
+      // AI in chunks of 20
+    ps(60,'Running AI analysis…','Tagging genres, vibes, difficulty…');
+    plog('Starting AI analysis in chunks of 20…');
+
+    var aiResults=[];
+    // Only send new or untagged games to AI — already-tagged games are stable
+    var needsAI=merged.filter(function(g){
+      var old=oldGamesMap[g.title];
+      if(!old) return true;                    // new game — always tag
+      return !old.genres||!old.genres.length||old.genres[0]==='?';  // previously untagged — retry
+    });
+    var skipAI=merged.length-needsAI.length;
+    if(skipAI>0){
+      var overriddenN=merged.filter(function(g){ return OVERRIDES[g.title]&&OVERRIDES[g.title].fields&&OVERRIDES[g.title].fields.length; }).length;
+      plog('Preserving tags for '+skipAI+' already-tagged games'+(overriddenN?' ('+overriddenN+' have manual overrides)':''));
+    }
+    var chunks=[];
+    for(var i=0;i<needsAI.length;i+=20) chunks.push(needsAI.slice(i,i+20));
+
+    return chunks.reduce(function(chain, chunk, ci){
+      return chain.then(function(){
+        ps(60+Math.round(ci/chunks.length*30),null,'Analyzing '+(ci*20+1)+'–'+Math.min((ci+1)*20,merged.length)+'…',(ci*20)+'/'+merged.length);
+        return aiAnalyze(chunk).then(function(res){
+          if(res){ aiResults=aiResults.concat(res); plog('AI chunk '+(ci+1)+'/'+chunks.length+': '+res.length+' games tagged'); }
+          else { plog('AI chunk '+(ci+1)+' failed — games get default tags'); }
+          // 20s between chunks → ~3 chunks/min; Groq free tier is 6,000 TPM and each chunk ~2,000 tokens
+          return sleep(20000);
+        });
+      });
+    }, Promise.resolve()).then(function(){
+      plog('AI done: '+aiResults.length+'/'+merged.length+' games tagged');
+      // Merge AI data — index by both exact lowercase AND normTitle so Roman numeral
+      // variants match: AI returning "Dark Souls III" still merges with stored "Dark Souls 3"
+      var aiMap={};
+      aiResults.forEach(function(a){
+        if(a&&a.title){
+          aiMap[a.title.toLowerCase()]=a;
+          var nn=normTitle(a.title);
+          if(nn&&!aiMap[nn]) aiMap[nn]=a;
+        }
+      });
+      GAMES_PURE=merged.map(function(g){
+        var old=oldGamesMap[g.title];
+        // Already tagged in previous run: preserve AI tags for stability, refresh non-tag data
+        if(old&&old.genres&&old.genres.length&&old.genres[0]!=='?'){
+          return Object.assign({},g,{genres:old.genres,subgenre:old.subgenre||'',vibes:old.vibes||[],mp:old.mp||[],difficulty:old.difficulty||null,sessionLength:old.sessionLength||null,playReason:old.playReason||''});
+        }
+        // New or previously untagged: use fresh AI result
+        var ai=aiMap[g.title.toLowerCase()] || aiMap[normTitle(g.title)]; // try exact, then normalised
+        return Object.assign({},g,{
+          // Use ['?'] for genres when AI didn't run — shows clearly as untagged, never silently wrong
+          genres:(ai&&ai.genres&&ai.genres.length)?ai.genres:['?'],
+          subgenre:(ai&&ai.subgenre)||'',
+          vibes:(ai&&ai.vibes)||[],
+          // AI mp most accurate; fall back to Steam categories; empty if neither available
+          mp:(ai&&ai.mp&&ai.mp.length)?ai.mp:(g.steamMp&&g.steamMp.length?g.steamMp:[]),
+          // null = not tagged; UI shows '?' instead of a wrong default number/label
+          difficulty:(ai&&ai.difficulty)||null,
+          sessionLength:(ai&&ai.sessionLength)||null,
+          playReason:(ai&&ai.playReason)||''
+        });
+      });
+      var tagged=GAMES_PURE.filter(function(g){ return g.genres&&g.genres.length&&g.genres[0]!=='?'; }).length;
+      plog('AI merge: '+tagged+'/'+GAMES_PURE.length+' games tagged'+(tagged===0?' ⚠ AI failed — all games show "?" — wait a few minutes then Refresh':''));
+      console.log('[GV] Post-merge genre check: '+tagged+'/'+GAMES_PURE.length+' games tagged by AI');
+      ps(97,'Saving library…');
+      localStorage.setItem(SK, JSON.stringify(GAMES_PURE)); // always save pure data — overrides live in gv6_overrides
+      localStorage.setItem(TSK, String(Date.now()));
+      fbPushLibrary();
+      syncGames(); // apply user overrides on top for in-memory rendering
+      ps(100,'Done! Loading your library…');
+      return sleep(400);
+    });
+    }); // close verifyStep.then
+    }); // close fetchRawgData .then
+  })
+  .then(function(){ launchApp(); })
+  .catch(function(e){
+    plog('Fatal error: '+e.message);
+    console.error(e);
+    ps(100,'Something went wrong — '+e.message);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  APP LAUNCH
+// ═══════════════════════════════════════════════════
+function showPS(){
+  document.getElementById('OB').style.display='none';
+  document.getElementById('PS').style.display='flex';
+  document.getElementById('APP').style.display='none';
+  document.getElementById('ps-log').innerHTML='';
+  ps(0,'Starting…','','');
+}
+function launchApp(){
+  document.getElementById('PS').style.display='none';
+  document.getElementById('OB').style.display='none';
+  document.getElementById('APP').style.display='block';
+  buildPills();
+  updateStats();
+  renderGames();
+  var _st; document.getElementById('Q').addEventListener('input', function(){ clearTimeout(_st); _st=setTimeout(renderGames,160); });
+  document.getElementById('SORT').addEventListener('change', renderGames);
+  document.querySelectorAll('.pill[data-f]').forEach(function(b){ b.addEventListener('click', toggleF); });
+  var ts=parseInt(localStorage.getItem(TSK)||'0');
+  if(Date.now()-ts > 7*86400000) document.getElementById('stale-w').style.display='block';
+}
+
+function buildPills(){
+  var genres=[]; var seen={};
+  GAMES.forEach(function(g){ (g.genres||[]).forEach(function(gn){ if(gn&&gn!=='?'&&!seen[gn]){ seen[gn]=1; genres.push(gn); } }); });
+  genres.sort();
+  var pg=document.getElementById('PG'); pg.innerHTML='';
+  genres.forEach(function(g){
+    var b=document.createElement('button');
+    b.className='pill'; b.dataset.f='genre'; b.dataset.v=g;
+    b.textContent=g.replace('_',' ');
+    b.addEventListener('click',toggleF); pg.appendChild(b);
+  });
+  var pm=document.getElementById('PM'); pm.innerHTML='';
+  VIBES.forEach(function(vb){
+    var b=document.createElement('button');
+    b.className='pill'; b.dataset.f='vibe'; b.dataset.v=vb.v;
+    b.textContent=vb.e+' '+vb.v;
+    b.addEventListener('click',toggleF); pm.appendChild(b);
+  });
+}
+function updateStats(){
+  document.getElementById('s-total').textContent=GAMES.length;
+  document.getElementById('s-coop').textContent=GAMES.filter(function(g){ return g.mp&&(g.mp.indexOf('Local_Coop')>-1||g.mp.indexOf('Online_Coop')>-1); }).length;
+  document.getElementById('s-vs').textContent=GAMES.filter(function(g){ return g.mp&&(g.mp.indexOf('Local_Versus')>-1||g.mp.indexOf('Online_Versus')>-1); }).length;
+  document.getElementById('s-fav').textContent=FAVS.length;
+  document.getElementById('s-queue').textContent=QUEUE.length;
+  document.getElementById('fav-btn').classList.toggle('hi', FAVS.length>0);
+  document.getElementById('queue-btn').classList.toggle('hi', QUEUE.length>0);
+}
+
+// ═══════════════════════════════════════════════════
+//  QUICK FILTERS
+// ═══════════════════════════════════════════════════
+var QF_MAP = {
+  family:{mp:['Local_Coop'],diff:['1','2']},
+  chill:{vibe:['Cozy','Chill']},
+  quick:{ses:['Quick']},
+  challenge:{diff:['4','5']},
+  story:{vibe:['Story']},
+  online:{mp:['Online_Coop','Online_Versus']}
+};
+function applyQF(btn){
+  var key=btn.dataset.qf;
+  if(AQF===key){ AQF=null; btn.classList.remove('on'); clearFilters(); return; }
+  clearFilters(false);
+  AQF=key;
+  document.querySelectorAll('.qf').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  var cfg=QF_MAP[key]||{};
+  if(cfg.mp) AF.mp=cfg.mp.slice();
+  if(cfg.diff) AF.diff=cfg.diff.slice();
+  if(cfg.vibe) AF.vibe=cfg.vibe.slice();
+  if(cfg.ses) AF.ses=cfg.ses.slice();
+  document.querySelectorAll('.pill[data-f]').forEach(function(p){
+    p.classList.toggle('on', (AF[p.dataset.f]||[]).indexOf(p.dataset.v)>-1);
+  });
+  renderGames();
+}
+
+// ═══════════════════════════════════════════════════
+//  FILTERS & RENDER
+// ═══════════════════════════════════════════════════
+function toggleF(e){
+  AQF=null;
+  document.querySelectorAll('.qf').forEach(function(b){ b.classList.remove('on'); });
+  var b=e.currentTarget, f=b.dataset.f, v=b.dataset.v;
+  var idx=AF[f].indexOf(v);
+  if(idx>-1){ AF[f].splice(idx,1); b.classList.remove('on'); }
+  else { AF[f].push(v); b.classList.add('on'); }
+  renderGames();
+}
+function clearFilters(render){
+  AQF=null;
+  Object.keys(AF).forEach(function(k){ AF[k]=[]; });
+  document.querySelectorAll('.pill,.qf').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('Q').value='';
+  if(render!==false) renderGames();
+}
+function getFiltered(){
+  var q=document.getElementById('Q').value.toLowerCase().trim();
+  var s=document.getElementById('SORT').value;
+  var gs=GAMES.filter(function(g){
+    if(q&&g.title.toLowerCase().indexOf(q)===-1) return false;
+    if(AF.genre.length&&!(g.genres||[]).some(function(gn){ return AF.genre.indexOf(gn)>-1; })) return false;
+    if(AF.vibe.length&&!(g.vibes||[]).some(function(v){ return AF.vibe.indexOf(v)>-1; })) return false;
+    if(AF.mp.length&&!(g.mp||[]).some(function(m){ return AF.mp.indexOf(m)>-1; })) return false;
+    if(AF.diff.length&&AF.diff.indexOf(String(g.difficulty))===-1) return false;
+    if(AF.ses.length&&AF.ses.indexOf(g.sessionLength)===-1) return false;
+    if(AF.mc.length){
+      var f=AF.mc[AF.mc.length-1];
+      if(f==='na'){ if(g.metacritic) return false; }
+      else { if(!g.metacritic||g.metacritic<parseInt(f)) return false; }
+    }
+    if(AF.star.length){
+      var sv=AF.star[AF.star.length-1];
+      if(sv==='rated'){ if(!STARS[g.title]) return false; }
+      else { var req=parseInt(sv); if(!STARS[g.title]||STARS[g.title]<req) return false; }
+    }
+    return true;
+  });
+  gs.sort(function(a,b){
+    if(s==='alpha') return a.title.localeCompare(b.title);
+    if(s==='alpha-d') return b.title.localeCompare(a.title);
+    if(s==='mc-d') return (b.metacritic||0)-(a.metacritic||0);
+    if(s==='diff-a') return a.difficulty-b.difficulty;
+    if(s==='diff-d') return b.difficulty-a.difficulty;
+    if(s==='fav'){ var af=FAVS.indexOf(a.title)>-1?0:1, bf=FAVS.indexOf(b.title)>-1?0:1; return af-bf||a.title.localeCompare(b.title); }
+    if(s==='queue'){ var aq=QUEUE.indexOf(a.title)>-1?0:1, bq=QUEUE.indexOf(b.title)>-1?0:1; return aq-bq||a.title.localeCompare(b.title); }
+    if(s==='played-d'){ var ap=(PLAYS[a.title]&&PLAYS[a.title][0])?PLAYS[a.title][0].ts:0, bp=(PLAYS[b.title]&&PLAYS[b.title][0])?PLAYS[b.title][0].ts:0; return bp-ap; }
+    if(s==='ses-a') return (SES_O[a.sessionLength]||2)-(SES_O[b.sessionLength]||2);
+    if(s==='ses-d') return (SES_O[b.sessionLength]||2)-(SES_O[a.sessionLength]||2);
+    if(s==='star-d'){ var as=STARS[a.title]||0, bs=STARS[b.title]||0; return bs-as||a.title.localeCompare(b.title); }
+    return 0;
+  });
+  return gs;
+}
+function renderGames(){
+  var gs=getFiltered();
+  var c=document.getElementById('GC');
+  c.className=VIEW==='grid'?'gg':'gl';
+  document.getElementById('RC').textContent=gs.length;
+  if(!gs.length){
+    c.innerHTML='<div class="empty"><div style="font-size:30px">🔍</div><div style="color:var(--text2)">No games match.</div><button class="clr" style="width:auto;padding:5px 12px;margin-top:6px" onclick="clearFilters()">Clear filters</button></div>';
+    return;
+  }
+  var frag=document.createDocumentFragment();
+  gs.forEach(function(g){ frag.appendChild(VIEW==='grid'?mkCard(g):mkList(g)); });
+  c.innerHTML='';
+  c.appendChild(frag);
+}
+function setView(v){
+  VIEW=v;
+  document.getElementById('VG').classList.toggle('on',v==='grid');
+  document.getElementById('VL').classList.toggle('on',v==='list');
+  renderGames();
+}
+
+// ═══════════════════════════════════════════════════
+//  CARD / LIST
+// ═══════════════════════════════════════════════════
+function mkImgPh(genre){
+  var gs=gst(genre||'Action');
+  return '<div class="gc-img-ph" style="background:'+gs.bg+';border:1px solid '+gs.b+'">🎮</div>';
+}
+function imgErr(el){
+  var fb=el.dataset.fb;
+  if(fb&&!el._triedFb){
+    el._triedFb=true;
+    el.src=fb;
+  } else {
+    // All sources exhausted — replace with genre-colored placeholder
+    var gs=gst(el.dataset.genre||'Action');
+    var ph=document.createElement('div');
+    var hVal=el.style.height;
+    var hPx=parseInt(hVal);
+    var isSm=hPx&&!isNaN(hPx)&&hPx<30;
+    ph.style.cssText='background:'+gs.bg+';border:1px solid '+gs.b
+      +';width:'+(el.style.width||'100%')
+      +';height:'+(hVal||'100%')
+      +';display:flex;align-items:center;justify-content:center'
+      +';overflow:hidden;font-size:'+(isSm?'11px':'28px')
+      +';color:var(--text3)';
+    if(el.style.borderRadius) ph.style.borderRadius=el.style.borderRadius;
+    if(el.style.flexShrink) ph.style.flexShrink=el.style.flexShrink;
+    ph.textContent='🎮';
+    if(el.parentNode) el.parentNode.replaceChild(ph, el);
+  }
+}
+function mkImgTag(g, cls, style){
+  // Image source priority:
+  //  1. Steam CDN header  — verified app ID (KNOWN_APPIDS exact match or RAWG-stores-confirmed)
+  //                         460x215 banner with game logo/title, perfect for card format
+  //  2. RAWG background   — app ID uncertain (fuzzy match not yet verified) or no app ID at all
+  //                         correct game artwork, works from file://, no CORS issues
+  //  3. Unverified Steam  — fuzzy appid but RAWG has no image either, last resort
+  //  4. Genre placeholder
+  var src, fb;
+  if(!g._fuzzy && g.appid){
+    // Verified: use Steam CDN header (looks exactly like Steam library)
+    src = g.headerImg || imgUrl(g.appid);
+    fb  = imgFallback(g.appid);
+  } else if(g.rawgImage){
+    // Uncertain/missing app ID: RAWG image is at least the right game
+    src = g.rawgImage;
+    fb  = g.appid ? imgUrl(g.appid) : '';
+  } else if(g.appid){
+    // Fuzzy app ID, no RAWG image: try Steam CDN anyway
+    src = g.headerImg || imgUrl(g.appid);
+    fb  = imgFallback(g.appid);
+  }
+  if(!src) return mkImgPh(pGenre(g));
+  return '<img class="'+cls+'" src="'+esc(src)+'" alt="'+esc(g.title)+'"'
+    +' loading="lazy" style="'+(style||'')+'"'
+    +' data-fb="'+esc(fb||'')+'" data-genre="'+esc(pGenre(g)||'Action')+'"'
+    +' onerror="imgErr(this)">';
+}
+
+function mkCard(g){
+  var fav=FAVS.indexOf(g.title)>-1;
+  var inQ=QUEUE.indexOf(g.title)>-1;
+  var dc=dcC(g.difficulty), gs=gst(pGenre(g));
+  var mc=g.metacritic;
+  var cmtN=(CMTS[g.title]||[]).length;
+  var playN=(PLAYS[g.title]||[]).length;
+  var starR=STARS[g.title]||0;
+  var el=document.createElement('div');
+  el.className='gc'+(fav?' fav':'');
+  var vibeTags=(g.vibes||[]).slice(0,2).map(function(v){
+    return '<span class="tag" style="background:rgba(255,255,255,.04);color:var(--text2);border:1px solid rgba(255,255,255,.06)">'+(VIBC[v]||'')+' '+v+'</span>';
+  }).join('');
+  el.innerHTML='<div class="acc" style="background:linear-gradient(90deg,'+gs.c+','+gs.c+'88)"></div>'
+    +'<div class="gc-img">'
+    +mkImgTag(g,'','width:100%;height:100%;object-fit:cover;display:block')
+    +(mc?'<div class="gc-mc" style="color:'+mcC(mc)+'">'+mc+'</div>':'<div class="gc-mc" style="color:var(--text3)">N/A</div>')
+    +'<button class="gc-fav'+(fav?' on':'')+'" onclick="doFav(event,\''+escQ(g.title)+'\')">'+(fav?'★':'☆')+'</button>'
+    +'<button class="gc-q'+(inQ?' on':'')+'" onclick="doQueue(event,\''+escQ(g.title)+'\')" title="Add to queue">▶</button>'
+    +'</div>'
+    +'<div class="gc-body">'
+    +'<div class="gc-title">'+esc(g.title)+'</div>'
+    +'<div class="gc-tags"><span class="tag" style="background:'+gs.bg+';color:'+gs.c+';border:1px solid '+gs.b+'">'+pGenre(g).replace('_',' ')+'</span>'+vibeTags+'</div>'
+    +'<div class="gc-desc">'+esc(g.steamDesc||g.playReason||'')+'</div>'
+    +'<div class="gc-foot">'
+    +'<div style="color:'+dc+';display:flex;align-items:center;gap:4px">'+dots(g.difficulty,dc)+'</div>'
+    +'<div style="display:flex;align-items:center;gap:6px">'
+    +(playN?'<div class="pdot" title="'+playN+' play logs"></div>':'')
+    +(cmtN?'<span style="font-size:9px;color:var(--text3)">💬 '+cmtN+'</span>':'')
+    +'<span style="font-size:9px;color:var(--text3)">'+sesLabel(g.sessionLength)+'</span>'
+    +(starR?'<span class="gc-star">★ '+starR+'</span>':'')
+    +'</div>'
+    +'</div>'
+    +'</div>';
+  el.addEventListener('click', function(e){
+    if(!e.target.classList.contains('gc-fav')&&!e.target.classList.contains('gc-q')) openMO(g);
+  });
+  return el;
+}
+function mkList(g){
+  var fav=FAVS.indexOf(g.title)>-1;
+  var inQ=QUEUE.indexOf(g.title)>-1;
+  var dc=dcC(g.difficulty), gs=gst(pGenre(g));
+  var mc=g.metacritic;
+  var starR=STARS[g.title]||0;
+  var el=document.createElement('div');
+  el.className='li'+(fav?' fav':'');
+  var mpSlice=(g.mp||[]).slice(0,2).map(function(m){ return MP_L[m]||m; }).join('<br>');
+  el.innerHTML=mkImgTag(g,'li-thumb','width:46px;height:22px;object-fit:cover')
+    +'<div><div class="li-title">'+esc(g.title)+'</div><div class="li-sub">'+esc(g.subgenre||'')+'&nbsp;·&nbsp;'+sesLabel(g.sessionLength)+'</div></div>'
+    +'<div class="li-tags"><span class="tag" style="background:'+gs.bg+';color:'+gs.c+';border:1px solid '+gs.b+'">'+pGenre(g).replace('_',' ')+'</span></div>'
+    +'<div class="li-mp">'+mpSlice+'</div>'
+    +'<div>'+(mc?'<div class="li-mc" style="color:'+mcC(mc)+'">'+mc+'</div>':'<div class="li-mc" style="color:var(--text3)">—</div>')+'<div style="color:'+dc+';margin-top:2px">'+dots(g.difficulty,dc)+'</div></div>'
+    +(starR?'<span class="gc-star" style="font-size:11px">★ '+starR+'</span>':'<span style="font-size:11px;color:var(--text3)">—</span>')
+    +'<button class="li-btn" style="color:'+(fav?'var(--amber)':'var(--text3)')+'" onclick="doFav(event,\''+escQ(g.title)+'\')">'+(fav?'★':'☆')+'</button>'
+    +'<button class="li-btn" style="color:'+(inQ?'var(--cyan)':'var(--text3)')+'" onclick="doQueue(event,\''+escQ(g.title)+'\')" title="Queue">▶</button>';
+  el.addEventListener('click', function(e){
+    if(!e.target.classList.contains('li-btn')) openMO(g);
+  });
+  return el;
+}
+
+// ═══════════════════════════════════════════════════
+//  FAVS + QUEUE
+// ═══════════════════════════════════════════════════
+function doFav(e, t){
+  e.stopPropagation();
+  var i=FAVS.indexOf(t);
+  if(i>-1) FAVS.splice(i,1); else FAVS.push(t);
+  localStorage.setItem(FK, JSON.stringify(FAVS));
+  updateStats(); renderGames();
+  if(OPEN&&OPEN.title===t) openMO(OPEN);
+  if(document.getElementById('FM').classList.contains('open')) renderFM();
+  fbPushPersonal();
+}
+function doQueue(e, t){
+  e.stopPropagation();
+  var i=QUEUE.indexOf(t);
+  if(i>-1) QUEUE.splice(i,1); else QUEUE.push(t);
+  localStorage.setItem(QK, JSON.stringify(QUEUE));
+  updateStats(); renderGames();
+  if(document.getElementById('QM').classList.contains('open')) renderQM();
+  fbPushPersonal();
+}
+// ═══════════════════════════════════════════════════
+//  STAR RATING
+// ═══════════════════════════════════════════════════
+var STAR_LABELS = ['','Not for me','Below average','Decent','Really good','Masterpiece'];
+function setStar(title, v){
+  if(STARS[title]===v){ delete STARS[title]; } else { STARS[title]=v; }
+  localStorage.setItem(STARS_K, JSON.stringify(STARS));
+  // Keep shared RATINGS in sync with this user's choice
+  if(FB_USER){
+    if(!RATINGS[title]) RATINGS[title]={};
+    if(STARS[title]){ RATINGS[title][FB_USER.uid]=STARS[title]; }
+    else { delete RATINGS[title][FB_USER.uid]; if(!Object.keys(RATINGS[title]).length) delete RATINGS[title]; }
+    localStorage.setItem(RATINGS_K, JSON.stringify(RATINGS));
+    fbPushRating();
+  }
+  updateStarUI(title);
+  renderGames();
+  fbPushPersonal();
+}
+function updateStarUI(title){
+  var r=STARS[title]||0;
+  var row=document.getElementById('mo-stars');
+  if(!row) return;
+  row.querySelectorAll('.star').forEach(function(s){ s.classList.toggle('lit', Number(s.dataset.v)<=r); });
+  var lbl=document.getElementById('mo-star-lbl');
+  if(lbl) lbl.textContent=r?STAR_LABELS[r]:'tap to rate';
+}
+function hoverStar(v){
+  var row=document.getElementById('mo-stars');
+  if(!row) return;
+  row.querySelectorAll('.star').forEach(function(s){ s.classList.toggle('lit', Number(s.dataset.v)<=v); });
+  var lbl=document.getElementById('mo-star-lbl');
+  if(lbl) lbl.textContent=STAR_LABELS[v]||'';
+}
+function leaveStar(){
+  if(OPEN) updateStarUI(OPEN.title);
+}
+function getRatingStats(title){
+  var r=RATINGS[title];
+  if(!r) return null;
+  var uids=Object.keys(r);
+  if(!uids.length) return null;
+  var total=0, count=0, dist={1:0,2:0,3:0,4:0,5:0};
+  uids.forEach(function(uid){ var v=r[uid]; if(v>=1&&v<=5){ total+=v; count++; dist[v]++; } });
+  if(!count) return null;
+  var avg=Math.round(total/count*10)/10;
+  // Build mini distribution bars
+  var bars='';
+  for(var s=5;s>=1;s--){
+    var pct=count?Math.round(dist[s]/count*100):0;
+    bars+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px">'
+      +'<span style="font-size:9px;color:var(--text3);width:6px">'+s+'</span>'
+      +'<div style="flex:1;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden">'
+      +'<div style="height:100%;width:'+pct+'%;background:var(--amber);border-radius:2px"></div>'
+      +'</div>'
+      +'<span style="font-size:9px;color:var(--text3);width:14px;text-align:right">'+(dist[s]||'')+'</span>'
+      +'</div>';
+  }
+  return '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:5px">'
+    +'<span style="font-size:20px;font-weight:800;color:var(--amber);font-family:\'Syne\',sans-serif">★ '+avg+'</span>'
+    +'<span style="font-size:10px;color:var(--text3)">'+count+' player'+(count>1?'s':'')+' rated</span>'
+    +'</div>'+bars;
+}
+function mkStarWidget(title){
+  var r=STARS[title]||0;
+  var stars='';
+  for(var i=1;i<=5;i++){
+    stars+='<span class="star'+(i<=r?' lit':'')+'" data-v="'+i
+      +'" onmouseover="hoverStar('+i+')" onclick="setStar(\''+escQ(title)+'\','+i+')">★</span>';
+  }
+  return '<div class="star-row" id="mo-stars" onmouseleave="leaveStar()">'+stars+'</div>'
+    +'<div id="mo-star-lbl" style="font-size:10px;color:var(--text3);margin-top:3px">'+(r?STAR_LABELS[r]:'tap to rate')+'</div>';
+}
+
+function openQM(){ renderQM(); document.getElementById('QM').classList.add('open'); }
+function closeQM(){ document.getElementById('QM').classList.remove('open'); }
+function renderQM(){
+  var list=document.getElementById('qm-list');
+  var empty=document.getElementById('qm-empty');
+  if(!QUEUE.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML=QUEUE.map(function(t, idx){
+    var g=GAMES.find(function(x){ return x.title===t; });
+    var gs=g?gst(pGenre(g)):{bg:'rgba(255,255,255,.05)',c:'#8b91a8',b:'rgba(255,255,255,.1)'};
+    var imgH=g?mkImgTag(g,'','width:52px;height:24px;object-fit:cover;border-radius:3px;flex-shrink:0'):'<div style="width:52px;height:24px;background:var(--bg4);border-radius:3px;flex-shrink:0"></div>';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;cursor:pointer;border:1px solid var(--border)" onclick="closeQM();openMO(GAMES.find(function(x){return x.title===\''+escQ(t)+'\'}));">'
+      +'<span style="font-family:\'Syne\',sans-serif;font-size:11px;color:var(--text3);width:18px;flex-shrink:0">'+(idx+1)+'</span>'
+      +imgH
+      +'<div style="flex:1;min-width:0"><div style="font-family:\'Syne\',sans-serif;font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t)+'</div>'
+      +(g?'<div style="font-size:10px;color:var(--text3)">'+pGenre(g).replace('_',' ')+' · '+sesLabel(g.sessionLength)+'</div>':'')
+      +'</div>'
+      +(g?'<span class="tag" style="font-size:9px;background:'+gs.bg+';color:'+gs.c+';border:1px solid '+gs.b+';flex-shrink:0">'+pGenre(g).replace('_',' ')+'</span>':'')
+      +'<button style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:0;flex-shrink:0" onclick="event.stopPropagation();doQueue(event,\''+escQ(t)+'\')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function openFM(){ renderFM(); document.getElementById('FM').classList.add('open'); }
+function closeFM(){ document.getElementById('FM').classList.remove('open'); }
+function renderFM(){
+  var list=document.getElementById('fm-list');
+  var empty=document.getElementById('fm-empty');
+  var favG=FAVS.map(function(t){ return GAMES.find(function(g){ return g.title===t; }); }).filter(Boolean);
+  if(!favG.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML=favG.map(function(g){
+    var gs=gst(pGenre(g)), dc=dcC(g.difficulty);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;cursor:pointer;border:1px solid rgba(245,183,49,.18)" onclick="closeFM();openMO(GAMES.find(function(x){return x.title===\''+escQ(g.title)+'\'}));">'
+      +mkImgTag(g,'','width:52px;height:24px;object-fit:cover;border-radius:3px;flex-shrink:0')
+      +'<div style="flex:1;min-width:0"><div style="font-family:\'Syne\',sans-serif;font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(g.title)+'</div>'
+      +'<div style="font-size:10px;color:var(--text3)">'+pGenre(g).replace('_',' ')+' · '+(DIFF_L[g.difficulty]||'?')+'</div></div>'
+      +(g.metacritic?'<span style="font-family:\'Syne\',sans-serif;font-size:12px;font-weight:800;color:'+mcC(g.metacritic)+';flex-shrink:0">'+g.metacritic+'</span>':'')
+      +'<button style="background:none;border:none;cursor:pointer;color:var(--amber);font-size:13px;padding:0;flex-shrink:0" onclick="event.stopPropagation();doFav(event,\''+escQ(g.title)+'\')">★</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  GAME MODAL
+// ═══════════════════════════════════════════════════
+function openMO(g){
+  OPEN=g;
+  var fav=FAVS.indexOf(g.title)>-1;
+  var inQ=QUEUE.indexOf(g.title)>-1;
+  var gs=gst(pGenre(g)), dc=dcC(g.difficulty), mc=g.metacritic;
+  var plays=PLAYS[g.title]||[];
+  var cmts=CMTS[g.title]||[];
+
+  var heroGs=gst(pGenre(g)||'Action');
+  var heroSrc, heroFb;
+  if(!g._fuzzy&&g.appid){ heroSrc=g.headerImg||imgUrl(g.appid); heroFb=imgFallback(g.appid); }
+  else if(g.rawgImage){ heroSrc=g.rawgImage; heroFb=g.appid?imgUrl(g.appid):''; }
+  else if(g.appid){ heroSrc=g.headerImg||imgUrl(g.appid); heroFb=imgFallback(g.appid); }
+  var heroH=heroSrc
+    ?'<img src="'+esc(heroSrc)+'" alt="'+esc(g.title)+'"'
+      +' style="width:100%;height:100%;object-fit:cover;display:block"'
+      +' data-fb="'+esc(heroFb)+'" data-genre="'+esc(pGenre(g)||'Action')+'"'
+      +' onerror="imgErr(this)">'
+    :'<div class="m-hero-ph" style="background:'+heroGs.bg+'">🎮</div>';
+
+  var mpTags=(g.mp||[]).map(function(m){ return '<span class="tag" style="font-size:11px;padding:3px 9px;background:rgba(255,255,255,.03);color:var(--text3);border:1px solid var(--border)">'+(MP_L[m]||m)+'</span>'; }).join('');
+  var vibeTags=(g.vibes||[]).map(function(v){ return '<span class="tag" style="font-size:11px;padding:3px 9px;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid rgba(255,255,255,.07)">'+(VIBC[v]||'')+' '+v+'</span>'; }).join('');
+
+  document.getElementById('MC').innerHTML=
+    '<button class="mx" onclick="closeMO()">✕</button>'
+    +'<div class="m-hero">'+heroH+(mc?'<div class="m-mc" style="color:'+mcC(mc)+'">'+mc+' <span style="font-size:9px;font-weight:400;opacity:.6">MC</span></div>':'')+'</div>'
+    +'<div class="m-body">'
+    +'<div class="m-title">'+esc(g.title)+'</div>'
+    +'<div class="m-sub">'+esc(g.developer||'')+(g.releaseDate?' · '+g.releaseDate:'')+'</div>'
+    +'<div class="m-tags">'+(g.genres&&g.genres.length?g.genres:['?']).map(function(gn){var gs2=gst(gn);return '<span class="tag" style="font-size:11px;padding:3px 9px;background:'+gs2.bg+';color:'+gs2.c+';border:1px solid '+gs2.b+'">'+gn.replace('_',' ')+'</span>';}).join('')+vibeTags+mpTags+'</div>'
+    +'<div style="margin-top:6px;margin-bottom:.75rem"><button class="edit-tags-btn" onclick="openEditTags(\''+escQ(g.title)+'\')">✏ Edit tags</button>'+(OVERRIDES[g.title]&&OVERRIDES[g.title].fields&&OVERRIDES[g.title].fields.length?'<span class="edited-badge" title="Overridden fields: '+((OVERRIDES[g.title]||{}).fields||[]).join(', ')+'">edited: '+((OVERRIDES[g.title]||{}).fields||[]).join(', ')+'</span>':'')+'</div>'
+    +'<div id="edit-tags-wrap"></div>'
+    +'<div class="m-acts" style="border-top:none;padding-top:0;margin-bottom:.875rem">'
+    +'<button class="mab" onclick="doFav(event,\''+escQ(g.title)+'\')">'+(fav?'★ Unfavorite':'☆ Favorite')+'</button>'
+    +'<button class="mab'+(inQ?' pri':'')+'" onclick="doQueue(event,\''+escQ(g.title)+'\')">'+(inQ?'▶ In Queue':'▶ Add to Queue')+'</button>'
+    +(g.appid?'<a class="mab" href="https://store.steampowered.com/app/'+g.appid+'" target="_blank">Steam ↗</a>':'')
+    +'</div>'
+    +(g.steamDesc?'<div class="m-desc">'+esc(g.steamDesc)+'</div>':'')
+    +'<div class="mgrid">'
+    +'<div class="ms"><div class="msl">Difficulty</div><div class="msv" style="color:'+dc+';display:flex;align-items:center;gap:5px">'+dots(g.difficulty,dc)+' '+(DIFF_L[g.difficulty]||'?')+'</div></div>'
+    +'<div class="ms"><div class="msl">Session</div><div class="msv">'+sesLabel(g.sessionLength)+'</div></div>'
+    +(mc?'<div class="ms"><div class="msl">Metacritic</div><div class="msv" style="color:'+mcC(mc)+';font-family:\'Syne\',sans-serif;font-size:20px;font-weight:800">'+mc+'<span style="font-size:10px;color:var(--text3);font-weight:400">/100</span></div></div>':'')
+    +(g.subgenre?'<div class="ms"><div class="msl">Subgenre</div><div class="msv">'+esc(g.subgenre)+'</div></div>':'')
+    +'<div class="ms"><div class="msl">My Rating</div><div class="msv">'+mkStarWidget(g.title)+'</div></div>'
+    +(getRatingStats(g.title)?'<div class="ms" style="grid-column:1/-1"><div class="msl">Room Ratings</div><div class="msv">'+getRatingStats(g.title)+'</div></div>':'')
+    +'</div>'
+    +(g.playReason?'<div class="m-why">💡 '+esc(g.playReason)+'</div>':'')
+    +'<div class="divider"></div>'
+    +'<div class="m-sec">📅 Play Log <span style="color:var(--text3);font-size:10px;font-weight:400">'+( plays.length?plays.length+' entr'+(plays.length>1?'ies':'y'):'none yet')+'</span></div>'
+    +'<div class="play-log" id="pl-log">'+renderPlays(g.title)+'</div>'
+    +'<div class="pf-row"><input class="pf-in" id="pl-who" placeholder="Who played?" maxlength="30" style="flex:1" value="'+esc(FB_DNAME||'')+'"><input class="pf-in" id="pl-date" type="date" style="width:140px;flex-shrink:0" value="'+new Date().toISOString().slice(0,10)+'"></div>'
+    +'<div class="pf-row"><input class="pf-in" id="pl-note" placeholder="Quick note (optional)" maxlength="80" style="flex:1"><button class="pf-submit" onclick="addPlay(\''+escQ(g.title)+'\')">Log Play</button></div>'
+    +(FB_USER?'<div style="margin-bottom:.625rem"><label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);cursor:pointer"><input type="checkbox" id="pl-pub" checked style="accent-color:var(--accent)">Visible to room members</label></div>':'')
+    +'<div class="divider"></div>'
+    +'<div class="m-sec">💬 Comments <span style="color:var(--text3);font-size:10px;font-weight:400">'+(cmts.length?cmts.length+' comment'+(cmts.length>1?'s':''):'none yet')+'</span></div>'
+    +'<div id="cm-log">'+renderCmts(g.title)+'</div>'
+    +'<div class="cf-row"><input class="pf-in" id="cf-name" placeholder="Your name" maxlength="30" style="width:130px;flex-shrink:0" value="'+esc(FB_DNAME||'')+'"><input class="pf-in" id="cf-rating" type="number" min="1" max="10" placeholder="★/10" style="width:70px;flex-shrink:0"><input class="pf-in" id="cf-text" placeholder="Your thoughts…" style="flex:1"></div>'
+    +'<div style="text-align:right;margin-bottom:.875rem"><button class="cf-submit" onclick="addCmt(\''+escQ(g.title)+'\')">Post Comment</button></div>'
+    +'<div class="divider"></div>'
+    +'<div class="sim-section-hdr" onclick="toggleSimPanel()">'
+    +'<span>🔍 Similar games</span>'
+    +'<span class="sim-hdr-arrow" id="sim-arrow">▾ show</span>'
+    +'</div>'
+    +'<div id="sim-panel"></div>'
+    +'</div>';
+  document.getElementById('MO').classList.add('open');
+}
+function openMOByTitle(title){
+  for(var i=0;i<GAMES.length;i++){ if(GAMES[i].title===title){ openMO(GAMES[i]); return; } }
+}
+function getSimilar(g){
+  var results=[];
+  for(var i=0;i<GAMES.length;i++){
+    var other=GAMES[i];
+    if(other.title===g.title) continue;
+    var score=0, reasons=[];
+    // Genre overlap (+8 per shared genre)
+    var aG=(g.genres||[]).filter(function(gn){ return gn!=='?'; });
+    var bG=(other.genres||[]).filter(function(gn){ return gn!=='?'; });
+    var sharedG=[];
+    for(var gi=0;gi<aG.length;gi++){ if(bG.indexOf(aG[gi])>-1) sharedG.push(aG[gi]); }
+    if(sharedG.length){
+      score+=sharedG.length*8;
+      reasons.push(sharedG.length===1?sharedG[0]+' genre':sharedG.length+' shared genres');
+    }
+    // Subgenre match (+4)
+    if(g.subgenre&&other.subgenre&&g.subgenre.toLowerCase()===other.subgenre.toLowerCase()) score+=4;
+    // Vibe overlap (+3 each)
+    var aV=g.vibes||[], bV=other.vibes||[], sharedV=[];
+    for(var j=0;j<aV.length;j++){ if(bV.indexOf(aV[j])>-1) sharedV.push(aV[j]); }
+    if(sharedV.length){
+      score+=sharedV.length*3;
+      reasons.push(sharedV.length===1?(VIBC[sharedV[0]]||'')+' '+sharedV[0]:sharedV.length+' shared vibes');
+    }
+    // Difficulty match (+3)
+    if(g.difficulty!==null&&g.difficulty!==undefined&&g.difficulty===other.difficulty) score+=3;
+    // Session length match (+2)
+    if(g.sessionLength&&other.sessionLength&&g.sessionLength===other.sessionLength) score+=2;
+    // Multiplayer overlap (+2 each mode)
+    var aM=g.mp||[], bM=other.mp||[];
+    for(var k=0;k<aM.length;k++){ if(bM.indexOf(aM[k])>-1) score+=2; }
+    if(score>0) results.push({g:other,score:score,reasons:reasons});
+  }
+  results.sort(function(a,b){ return b.score-a.score; });
+  return results.slice(0,8);
+}
+function toggleSimPanel(){
+  var panel=document.getElementById('sim-panel');
+  var arrow=document.getElementById('sim-arrow');
+  if(!panel||!OPEN) return;
+  // Toggle off if already open
+  if(panel.innerHTML.trim()){ panel.innerHTML=''; if(arrow) arrow.textContent='▾ show'; return; }
+  // Build results
+  var results=getSimilar(OPEN);
+  if(!results.length){
+    panel.innerHTML='<div class="sim-inner"><div style="font-size:12px;color:var(--text3)">No strong matches found — try editing tags on some games.</div></div>';
+    if(arrow) arrow.textContent='▴ hide';
+    return;
+  }
+  if(arrow) arrow.textContent='▴ hide';
+  var html='<div class="sim-inner"><div class="sim-lbl">Matches for '+esc(OPEN.title)+'</div><div class="sim-scroll"><div class="sim-grid">';
+  for(var i=0;i<results.length;i++){
+    var r=results[i], og=r.g;
+    var gs=gst(pGenre(og));
+    var src=og.appid?imgUrl(og.appid):'';
+    var why=r.reasons.length?r.reasons.slice(0,2).join(' · '):'Similar style';
+    html+='<div class="sim-card" onclick="openMOByTitle(\''+escQ(og.title)+'\')">'
+      +(src?'<img class="sim-thumb" src="'+esc(src)+'" alt="" onerror="this.style.opacity=0">':'<div class="sim-thumb" style="background:'+gs.bg+'"></div>')
+      +'<div class="sim-info"><div class="sim-title">'+esc(og.title)+'</div>'
+      +'<div class="sim-reason">'+esc(why)+'</div></div>'
+      +'</div>';
+  }
+  html+='</div></div></div>';
+  panel.innerHTML=html;
+}
+function renderPlays(title){
+  var p=PLAYS[title]||[];
+  if(!p.length) return '<div class="no-data">No plays logged yet.</div>';
+  return p.map(function(entry, i){
+    return '<div class="play-entry">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span class="play-who">'+esc(entry.who)+'</span>'
+      +(entry.pub===false?'<span class="play-priv" title="Private — only you can see this">🔒</span>':'')
+      +'<span class="play-date">'+new Date(entry.ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+'</span>'
+      +(entry.note?'<span class="play-note">'+esc(entry.note)+'</span>':'')
+      +'</div>'
+      +'<button class="play-del" onclick="delPlay(\''+escQ(title)+'\','+i+')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function renderCmts(title){
+  var c=CMTS[title]||[];
+  if(!c.length) return '<div class="no-data">No comments yet.</div>';
+  return c.map(function(cm, i){
+    return '<div class="comment">'
+      +'<div class="c-header">'
+      +'<div class="c-author">'+esc(cm.who)+(cm.rating?'<span class="c-rating">★ '+cm.rating+'/10</span>':'')+'<span class="c-date">'+new Date(cm.ts).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'</span></div>'
+      +'<button class="c-del" onclick="delCmt(\''+escQ(title)+'\','+i+')">✕</button>'
+      +'</div>'
+      +'<div class="c-text">'+esc(cm.text)+'</div>'
+      +'</div>';
+  }).join('');
+}
+function addPlay(title){
+  var who=document.getElementById('pl-who').value.trim()||'Someone';
+  var dateV=document.getElementById('pl-date').value;
+  var note=document.getElementById('pl-note').value.trim();
+  var pubEl=document.getElementById('pl-pub');
+  var pub=pubEl?pubEl.checked:true;
+  var ts=dateV?new Date(dateV).getTime():Date.now();
+  if(!PLAYS[title]) PLAYS[title]=[];
+  var entry={who:who,note:note,ts:ts,pub:pub};
+  if(FB_USER) entry.uid=FB_USER.uid;
+  PLAYS[title].unshift(entry);
+  localStorage.setItem(PK, JSON.stringify(PLAYS));
+  document.getElementById('pl-log').innerHTML=renderPlays(title);
+  document.getElementById('pl-note').value='';
+  toast('Play logged! 📅');
+  renderGames();
+  fbPushActivity();
+}
+function delPlay(title,idx){
+  if(!confirm('Delete this play entry?')) return;
+  PLAYS[title].splice(idx,1);
+  localStorage.setItem(PK, JSON.stringify(PLAYS));
+  if(OPEN) openMO(OPEN);
+  renderGames();
+}
+function addCmt(title){
+  var who=document.getElementById('cf-name').value.trim()||'Anonymous';
+  var text=document.getElementById('cf-text').value.trim();
+  var rv=document.getElementById('cf-rating').value;
+  var rating=rv?Math.min(10,Math.max(1,parseInt(rv))):null;
+  if(!text){ toast('Write something first!'); return; }
+  if(!CMTS[title]) CMTS[title]=[];
+  var entry={who:who,text:text,rating:rating,ts:Date.now()};
+  if(FB_USER) entry.uid=FB_USER.uid;
+  CMTS[title].unshift(entry);
+  localStorage.setItem(CK, JSON.stringify(CMTS));
+  document.getElementById('cm-log').innerHTML=renderCmts(title);
+  document.getElementById('cf-text').value='';
+  document.getElementById('cf-rating').value='';
+  toast('Comment posted! 💬');
+  renderGames();
+  fbPushActivity();
+}
+function delCmt(title,idx){
+  if(!confirm('Delete?')) return;
+  CMTS[title].splice(idx,1);
+  localStorage.setItem(CK, JSON.stringify(CMTS));
+  document.getElementById('cm-log').innerHTML=renderCmts(title);
+}
+function closeMO(){ document.getElementById('MO').classList.remove('open'); OPEN=null; }
+
+// ═══════════════════════════════════════════════════
+//  TAG EDITING
+// ═══════════════════════════════════════════════════
+function openEditTags(title){
+  var wrap=document.getElementById('edit-tags-wrap');
+  if(!wrap) return;
+  if(wrap.innerHTML){ wrap.innerHTML=''; return; } // toggle off
+  var g=null;
+  for(var i=0;i<GAMES.length;i++){ if(GAMES[i].title===title){ g=GAMES[i]; break; } }
+  if(!g) return;
+
+  var genreOpts=Object.keys(GS).map(function(gn){
+    var on=(g.genres||[]).indexOf(gn)>-1;
+    return '<button class="ep'+(on?' on':'')+'" data-v="'+esc(gn)+'" onclick="etToggle(this,\'genres\')">'+gn.replace(/_/g,' ')+'</button>';
+  }).join('');
+
+  var vibeOpts=VIBES.map(function(vb){
+    var on=(g.vibes||[]).indexOf(vb.v)>-1;
+    return '<button class="ep'+(on?' on':'')+'" data-v="'+vb.v+'" onclick="etToggle(this,\'multi\')">'+vb.e+' '+vb.v+'</button>';
+  }).join('');
+
+  var diffE=['','😌','🙂','😐','😤','💀'];
+  var diffOpts=[1,2,3,4,5].map(function(n){
+    return '<button class="ep'+(g.difficulty===n?' on':'')+'" data-v="'+n+'" onclick="etToggle(this,\'single\')">'+diffE[n]+' '+DIFF_L[n]+'</button>';
+  }).join('');
+
+  var sesOpts=['Quick','Medium','Long','Epic'].map(function(s){
+    return '<button class="ep'+(g.sessionLength===s?' on':'')+'" data-v="'+s+'" onclick="etToggle(this,\'single\')">'+sE(s)+' '+s+'</button>';
+  }).join('');
+
+  var mpTypes=['Solo','Local_Coop','Online_Coop','Local_Versus','Online_Versus'];
+  var mpOpts=mpTypes.map(function(m){
+    var on=(g.mp||[]).indexOf(m)>-1;
+    return '<button class="ep'+(on?' on':'')+'" data-v="'+m+'" onclick="etToggle(this,\'multi\')">'+MP_L[m]+'</button>';
+  }).join('');
+
+  wrap.innerHTML='<div class="edit-panel">'
+    +'<div class="edit-row"><div class="edit-lbl">Genres <span style="font-weight:400;color:var(--text3);font-size:10px">1–3 · first = primary</span></div><div class="edit-tp" id="et-genre">'+genreOpts+'</div></div>'
+    +'<div class="edit-row"><div class="edit-lbl">Vibes</div><div class="edit-tp" id="et-vibe">'+vibeOpts+'</div></div>'
+    +'<div class="edit-row"><div class="edit-lbl">Difficulty</div><div class="edit-tp" id="et-diff">'+diffOpts+'</div></div>'
+    +'<div class="edit-row"><div class="edit-lbl">Session</div><div class="edit-tp" id="et-ses">'+sesOpts+'</div></div>'
+    +'<div class="edit-row"><div class="edit-lbl">Multiplayer</div><div class="edit-tp" id="et-mp">'+mpOpts+'</div></div>'
+    +'<div style="display:flex;gap:6px;margin-top:.25rem;flex-wrap:wrap">'
+    +'<button class="edit-save" onclick="saveTagEdits(\''+escQ(title)+'\')">Save changes</button>'
+    +'<button class="edit-cancel" onclick="closeEditTags()">Cancel</button>'
+    +'<button class="edit-cancel" style="color:#f87171;border-color:rgba(248,113,113,.3);margin-left:auto" onclick="resetGameToAI(\''+escQ(title)+'\')">↺ Reset to AI</button>'
+    +'</div></div>';
+}
+function etToggle(btn, mode){
+  if(mode==='single'){
+    var tp=btn.parentNode;
+    var btns=tp.querySelectorAll('.ep');
+    for(var i=0;i<btns.length;i++) btns[i].classList.remove('on');
+    btn.classList.add('on');
+  } else if(mode==='genres'){
+    // Multi-select, max 3; order in DOM = display order (first = primary)
+    if(btn.classList.contains('on')){
+      btn.classList.remove('on');
+    } else {
+      var tp2=btn.parentNode;
+      var onCount=tp2.querySelectorAll('.ep.on').length;
+      if(onCount<3) btn.classList.add('on');
+    }
+  } else {
+    btn.classList.toggle('on');
+  }
+}
+function closeEditTags(){
+  var wrap=document.getElementById('edit-tags-wrap');
+  if(wrap) wrap.innerHTML='';
+}
+function resetGameToAI(title){
+  delete OVERRIDES[title];
+  localStorage.setItem(OVERRIDES_K, JSON.stringify(OVERRIDES));
+  var mw=document.querySelector('#MO .mw');
+  var scrollPos=mw?mw.scrollTop:0;
+  syncGames();
+  renderGames();
+  var g=null; for(var i=0;i<GAMES.length;i++){ if(GAMES[i].title===title){ g=GAMES[i]; break; } }
+  if(g){ openMO(g); var mw2=document.querySelector('#MO .mw'); if(mw2) setTimeout(function(){ mw2.scrollTop=scrollPos; },0); }
+  toast('Reset to AI defaults ✓');
+}
+function clearLibrary(){
+  if(!confirm('Clear your entire game library?\n\nThis removes all games, play logs, comments, favourites, queue, ratings, and tag edits.\n\nYour API keys will be kept.')) return;
+  [SK,TK,FK,CK,QK,PK,TSK,STARS_K,OVERRIDES_K].forEach(function(k){ localStorage.removeItem(k); });
+  location.reload();
+}
+function saveTagEdits(title){
+  var wrap=document.getElementById('edit-tags-wrap');
+  if(!wrap) return;
+  // Compare against pure AI data — only fields that differ become overrides
+  var pureGame=null;
+  for(var i=0;i<GAMES_PURE.length;i++){ if(GAMES_PURE[i].title===title){ pureGame=GAMES_PURE[i]; break; } }
+  if(!pureGame) return;
+
+  var genreEls=wrap.querySelectorAll('#et-genre .ep.on');
+  var vibeEls=wrap.querySelectorAll('#et-vibe .ep.on');
+  var diffEl=wrap.querySelector('#et-diff .ep.on');
+  var sesEl=wrap.querySelector('#et-ses .ep.on');
+  var mpEls=wrap.querySelectorAll('#et-mp .ep.on');
+
+  var newGenres=[]; for(var gi=0;gi<genreEls.length;gi++) newGenres.push(genreEls[gi].dataset.v);
+  if(!newGenres.length) newGenres=pureGame.genres&&pureGame.genres.length?pureGame.genres.slice():['?'];
+  var newVibes=[]; for(var j=0;j<vibeEls.length;j++) newVibes.push(vibeEls[j].dataset.v);
+  var newDiff=diffEl?parseInt(diffEl.dataset.v):pureGame.difficulty;
+  var newSes=sesEl?sesEl.dataset.v:pureGame.sessionLength;
+  var newMp=[]; for(var k=0;k<mpEls.length;k++) newMp.push(mpEls[k].dataset.v);
+
+  // Build field-level override — only store fields that actually differ from AI
+  var ov={}, fields=[];
+  if(!arraysEqual(newGenres,pureGame.genres||[])){ ov.genres=newGenres; fields.push('genres'); }
+  if(!arraysEqual(newVibes,pureGame.vibes||[])){ ov.vibes=newVibes; fields.push('vibes'); }
+  if(newDiff!==(pureGame.difficulty||null)){ ov.difficulty=newDiff; fields.push('difficulty'); }
+  if(newSes!==pureGame.sessionLength){ ov.sessionLength=newSes; fields.push('sessionLength'); }
+  if(!arraysEqual(newMp,pureGame.mp||[])){ ov.mp=newMp; fields.push('mp'); }
+
+  if(fields.length){ ov.fields=fields; OVERRIDES[title]=ov; }
+  else { delete OVERRIDES[title]; } // no diff from AI — clear any existing override
+
+  localStorage.setItem(OVERRIDES_K, JSON.stringify(OVERRIDES));
+  fbPushLibrary();
+  // gv6_games is never touched here — pure AI data stays intact
+
+  var mw=document.querySelector('#MO .mw');
+  var scrollPos=mw?mw.scrollTop:0;
+  syncGames();
+  renderGames();
+  var g=null; for(var ii=0;ii<GAMES.length;ii++){ if(GAMES[ii].title===title){ g=GAMES[ii]; break; } }
+  if(g) openMO(g);
+  var mw2=document.querySelector('#MO .mw');
+  if(mw2) setTimeout(function(){ mw2.scrollTop=scrollPos; },0);
+  closeEditTags();
+  if(fields.length) toast('Tags updated ✓ ('+fields.join(', ')+')');
+  else toast('No changes from AI — override cleared');
+}
+
+// ═══════════════════════════════════════════════════
+//  WIZARD
+// ═══════════════════════════════════════════════════
+var wizState={time:null,who:null,vibe:null};
+var WIZ_Q=[
+  {key:'time',q:'How much time do you have?',hint:"We'll match session lengths.",opts:[
+    {v:'Quick',icon:'⚡',label:'Quick',desc:'Under 30 minutes'},
+    {v:'Medium',icon:'🕐',label:'Hour or two',desc:'30 min – 2 hours'},
+    {v:'Long',icon:'🌙',label:'Long session',desc:'2–5 hours'},
+    {v:'Epic',icon:'🏔',label:'All day',desc:'5+ hours'}
+  ]},
+  {key:'who',q:"Who's playing?",hint:'Affects multiplayer suggestions.',opts:[
+    {v:'solo',icon:'🧍',label:'Just me',desc:'Solo experience'},
+    {v:'local',icon:'🛋️',label:'Family/friends here',desc:'Same room'},
+    {v:'online',icon:'🌐',label:'Friends online',desc:'Internet MP'},
+    {v:'any',icon:'🎲',label:'No preference',desc:'Show anything'}
+  ]},
+  {key:'vibe',q:"What's your mood?",hint:'Pick the feeling you want.',opts:[
+    {v:'Cozy',icon:'🧸',label:'Cozy',desc:'Warm, no pressure'},
+    {v:'Action',icon:'💥',label:'Action',desc:'Fast, explosive'},
+    {v:'Tense',icon:'😬',label:'Tense/Scary',desc:'Edge of my seat'},
+    {v:'Story',icon:'📖',label:'Story',desc:'Great narrative'},
+    {v:'Mindless',icon:'🧠',label:'Mindless',desc:'Just chill & grind'},
+    {v:'Challenge',icon:'🏆',label:'Challenge',desc:'Test my skills'},
+    {v:'Creative',icon:'🎨',label:'Creative',desc:'Build & craft'},
+    {v:'Social',icon:'🤣',label:'Social',desc:'Laughs with others'},
+    {v:'any',icon:'🎲',label:'Surprise me',desc:'Anything'}
+  ]}
+];
+function openWizard(){ wizState={time:null,who:null,vibe:null}; renderWizStep(0); document.getElementById('WIZ').classList.add('open'); }
+function closeWiz(){ document.getElementById('WIZ').classList.remove('open'); }
+function renderWizStep(step){
+  if(step>=WIZ_Q.length){ renderRecs(); return; }
+  var q=WIZ_Q[step];
+  var cols=q.opts.length>4;
+  var optsH=q.opts.map(function(o){
+    return '<button class="wiz-opt'+(wizState[q.key]===o.v?' sel':'')+'" onclick="wizPick(\''+q.key+'\',\''+o.v+'\','+step+')">'
+      +'<span class="wiz-opt-icon">'+o.icon+'</span>'
+      +'<span class="wiz-opt-label">'+o.label+'</span>'
+      +'<span class="wiz-opt-desc">'+o.desc+'</span>'
+      +'</button>';
+  }).join('');
+  document.getElementById('wiz-wrap').innerHTML=
+    '<div style="font-size:10px;color:var(--text3);margin-bottom:1rem">Step '+(step+1)+' of '+WIZ_Q.length+'</div>'
+    +'<div class="wiz-q">'+q.q+'</div>'
+    +'<div class="wiz-hint">'+q.hint+'</div>'
+    +'<div class="wiz-opts'+(cols?' cols2':'')+'">'+optsH+'</div>'
+    +'<div class="wiz-nav">'
+    +(step>0?'<button class="wiz-back" onclick="renderWizStep('+(step-1)+')">← Back</button>':'')
+    +'<button class="wiz-next" onclick="renderWizStep('+(step+1)+')" '+(wizState[q.key]?'':'disabled')+'>Next →</button>'
+    +'</div>';
+}
+function wizPick(key,val,step){
+  wizState[key]=val;
+  document.querySelectorAll('.wiz-opt').forEach(function(b){ b.classList.remove('sel'); });
+  event.currentTarget.classList.add('sel');
+  document.querySelector('.wiz-next').disabled=false;
+  var s=step;
+  setTimeout(function(){ renderWizStep(s+1); }, 320);
+}
+function renderRecs(){
+  var pool=GAMES.slice();
+  var timeMap={Quick:['Quick'],Medium:['Quick','Medium'],Long:['Quick','Medium','Long'],Epic:['Quick','Medium','Long','Epic']};
+  if(wizState.time) pool=pool.filter(function(g){ return (timeMap[wizState.time]||[]).indexOf(g.sessionLength)>-1; });
+  if(wizState.who==='solo') pool=pool.filter(function(g){ return g.mp&&g.mp.indexOf('Solo')>-1; });
+  if(wizState.who==='local') pool=pool.filter(function(g){ return g.mp&&(g.mp.indexOf('Local_Coop')>-1||g.mp.indexOf('Local_Versus')>-1); });
+  if(wizState.who==='online') pool=pool.filter(function(g){ return g.mp&&(g.mp.indexOf('Online_Coop')>-1||g.mp.indexOf('Online_Versus')>-1); });
+  if(wizState.vibe&&wizState.vibe!=='any') pool=pool.filter(function(g){ return (g.vibes||[]).indexOf(wizState.vibe)>-1; });
+  var scored=pool.map(function(g){
+    return {g:g, score:(FAVS.indexOf(g.title)>-1?2:0)+(QUEUE.indexOf(g.title)>-1?1:0)+(g.metacritic||50)/50+Math.random()*0.5};
+  });
+  scored.sort(function(a,b){ return b.score-a.score; });
+  var picks=scored.slice(0,3).map(function(x){ return x.g; });
+  if(!picks.length){
+    document.getElementById('wiz-wrap').innerHTML='<div class="wiz-q">No exact matches 😅</div><div class="wiz-hint" style="margin-bottom:1.25rem">Try relaxing one of your answers.</div><button class="wiz-retry" onclick="openWizard()">← Try again</button>';
+    return;
+  }
+  var labels=['Perfect pick','Close second','Wild card'];
+  var cardsH=picks.map(function(g,i){
+    var gs=gst(pGenre(g));
+    var vibH=(g.vibes||[]).slice(0,1).map(function(v){ return '<span class="tag" style="font-size:9px;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid rgba(255,255,255,.06)">'+(VIBC[v]||'')+' '+v+'</span>'; }).join('');
+    return '<div class="rec-card" onclick="closeWiz();openMO(GAMES.find(function(x){return x.title===\''+escQ(g.title)+'\'}));">'
+      +'<div class="rec-img">'+mkImgTag(g,'','width:100%;height:100%;object-fit:cover;display:block')+'</div>'
+      +'<div class="rec-body">'
+      +'<div class="rec-num">'+labels[i]+'</div>'
+      +'<div class="rec-title">'+esc(g.title)+'</div>'
+      +'<div class="rec-why">'+esc(g.playReason||g.steamDesc.slice(0,80)||'')+'</div>'
+      +'<div class="rec-tags"><span class="tag" style="font-size:9px;background:'+gs.bg+';color:'+gs.c+';border:1px solid '+gs.b+'">'+pGenre(g).replace('_',' ')+'</span>'+vibH+'<span class="tag" style="font-size:9px;background:rgba(255,255,255,.03);color:var(--text3);border:1px solid var(--border)">'+sesLabel(g.sessionLength)+'</span></div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('wiz-wrap').innerHTML=
+    '<div style="font-size:10px;color:var(--text3);margin-bottom:.75rem">Recommended for you</div>'
+    +'<div class="wiz-q" style="font-size:16px;margin-bottom:.25rem">Here\'s what to play 🎮</div>'
+    +'<div class="wiz-hint">Based on your time, company, and mood.</div>'
+    +'<div class="rec-list">'+cardsH+'</div>'
+    +'<button class="wiz-retry" onclick="openWizard()">← Try different answers</button>';
+}
+
+// ═══════════════════════════════════════════════════
+//  RANDOM PICKER
+// ═══════════════════════════════════════════════════
+function openRandom(){
+  var pool=getFiltered();
+  if(!pool.length){ toast('No games to pick from!'); return; }
+  var g=pool[Math.floor(Math.random()*pool.length)];
+  var gs=gst(pGenre(g)), dc=dcC(g.difficulty);
+  var vibH=(g.vibes||[]).slice(0,2).map(function(v){ return '<span class="tag" style="background:rgba(255,255,255,.04);color:var(--text2);border:1px solid rgba(255,255,255,.06)">'+(VIBC[v]||'')+' '+v+'</span>'; }).join('');
+  document.getElementById('spin-content').innerHTML=
+    '<div style="font-size:10px;color:var(--text3);margin-bottom:.75rem">🎲 Random pick from '+pool.length+' games</div>'
+    +'<div class="spin-title">'+esc(g.title)+'</div>'
+    +'<div class="spin-sub">'+esc(g.subgenre||'')+'</div>'
+    +'<div class="spin-card">'
+    +mkImgTag(g,'','width:100%;aspect-ratio:460/215;object-fit:cover;display:block')
+    +'<div class="spin-body">'
+    +'<div class="spin-tags"><span class="tag" style="background:'+gs.bg+';color:'+gs.c+';border:1px solid '+gs.b+'">'+pGenre(g).replace('_',' ')+'</span>'+vibH+'</div>'
+    +(g.playReason?'<div class="spin-why">'+esc(g.playReason)+'</div>':'')
+    +'<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--text3)">'+dots(g.difficulty,dc)+' '+sesLabel(g.sessionLength)+'</div>'
+    +'</div></div>'
+    +'<button class="spin-btn" onclick="closeRP();openMO(GAMES.find(function(x){return x.title===\''+escQ(g.title)+'\'}));">Open this game →</button>'
+    +'<button class="spin-btn alt" onclick="openRandom()">🎲 Pick again</button>';
+  document.getElementById('RP').classList.add('open');
+}
+function closeRP(){ document.getElementById('RP').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════
+//  EDIT / REFRESH / RESET
+// ═══════════════════════════════════════════════════
+function openEdit(){ document.getElementById('ETA').value=GAMES.map(function(g){ return g.title; }).join('\n'); document.getElementById('EM').classList.add('open'); }
+function saveEdit(){
+  var titles=document.getElementById('ETA').value.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  if(!titles.length){ toast('List is empty!'); return; }
+  closeOv('EM');
+  buildLibrary(titles,null,true);
+}
+function openMM(){
+  var saved=localStorage.getItem('gv6_akey')||'';
+  var savedR=localStorage.getItem(RAWG_SK)||'';
+  var el=document.getElementById('mm-akey');
+  var rel=document.getElementById('mm-rkey');
+  if(el&&saved) el.value=saved;
+  if(rel&&savedR) rel.value=savedR;
+  var cnt=GAMES_PURE?GAMES_PURE.length:0;
+  var ts=localStorage.getItem(TSK);
+  var statusEl=document.getElementById('mm-status');
+  if(statusEl){
+    var when=ts?new Date(parseInt(ts)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'never';
+    statusEl.textContent=cnt+' game'+(cnt===1?'':'s')+' · last updated '+when;
+  }
+  document.getElementById('MM').classList.add('open');
+  updateMMSync();
+}
+function closeMM(){
+  var el=document.getElementById('MM');
+  if(el) el.classList.remove('open');
+}
+function openRefresh(){ openMM(); } // legacy alias
+function doRefresh(){
+  var keyEl=document.getElementById('mm-akey');
+  var key=keyEl?keyEl.value.trim():'';
+  if(key) localStorage.setItem('gv6_akey',key);
+  var rkeyEl=document.getElementById('mm-rkey');
+  var rkey=rkeyEl?rkeyEl.value.trim():'';
+  if(rkey) localStorage.setItem(RAWG_SK,rkey);
+  closeMM();
+  var src=JSON.parse(localStorage.getItem(TK)||'null');
+  buildLibrary(src?src.titles:null, src?src.appids:null, true);
+}
+function doRetryAiOnly(){
+  // Save any newly entered API key before closing the dialog
+  var keyEl=document.getElementById('mm-akey');
+  var key=keyEl?keyEl.value.trim():'';
+  if(key) localStorage.setItem('gv6_akey',key);
+  closeMM();
+
+  if(!GAMES||!GAMES.length){
+    alert('No library loaded yet. Use Full Refresh to import first.');
+    return;
+  }
+  var apiKey=localStorage.getItem('gv6_akey')||'';
+  if(!apiKey){
+    alert('No Groq API key saved. Open ⚙ Manage and enter your Groq key first.');
+    return;
+  }
+
+  // Only re-tag games that have no genres or show '?' — already-tagged games keep their data
+  var untagged=GAMES.filter(function(g){ return !g.genres||!g.genres.length||g.genres[0]==='?'; });
+  var total=untagged.length;
+  if(!total){
+    plog('All '+GAMES.length+' games already tagged — nothing to retry.');
+    return;
+  }
+
+  showPS();
+  aiAnalyze._logged=false;
+  plog('AI-only retry: re-tagging '+total+' untagged games (skipping RAWG & Steam steps)');
+
+  var CHUNK=20;
+  var chunks=[];
+  for(var i=0;i<untagged.length;i+=CHUNK) chunks.push(untagged.slice(i,i+CHUNK));
+  plog('Split into '+chunks.length+' chunk(s) of up to '+CHUNK+' games');
+
+  var aiResults=[];
+  chunks.reduce(function(chain,chunk,ci){
+    return chain.then(function(){
+      ps(10+Math.round(ci/chunks.length*80),null,'Analyzing '+(ci*CHUNK+1)+'–'+Math.min((ci+1)*CHUNK,total)+'…',(ci*CHUNK)+'/'+total);
+      return aiAnalyze(chunk).then(function(res){
+        if(res){ aiResults=aiResults.concat(res); plog('AI chunk '+(ci+1)+'/'+chunks.length+': '+res.length+' games tagged'); }
+        else { plog('AI chunk '+(ci+1)+'/'+chunks.length+' failed — those games remain "?"'); }
+        // 20s between chunks — same rate-limit protection as full build
+        if(ci<chunks.length-1) return sleep(20000);
+      });
+    });
+  }, Promise.resolve()).then(function(){
+    plog('AI done: '+aiResults.length+'/'+total+' games re-tagged');
+    // Merge new AI results — only update games that were untagged; leave already-tagged games alone
+    var aiMap={};
+    aiResults.forEach(function(a){
+      if(a&&a.title){
+        aiMap[a.title.toLowerCase()]=a;
+        var nn=normTitle(a.title);
+        if(nn&&!aiMap[nn]) aiMap[nn]=a;
+      }
+    });
+    var fixed=0;
+    GAMES_PURE=GAMES_PURE.map(function(g){
+      // Only update untagged games — already-tagged pure data stays stable
+      if(g.genres&&g.genres.length&&g.genres[0]!=='?') return g;
+      var ai=aiMap[g.title.toLowerCase()] || aiMap[normTitle(g.title)];
+      if(!ai) return g; // AI didn't return data for this game — leave as '?'
+      fixed++;
+      return Object.assign({},g,{
+        genres:(ai.genres&&ai.genres.length)?ai.genres:['?'],
+        subgenre:ai.subgenre||'',
+        vibes:ai.vibes||[],
+        mp:(ai.mp&&ai.mp.length)?ai.mp:(g.steamMp&&g.steamMp.length?g.steamMp:[]),
+        difficulty:ai.difficulty||null,
+        sessionLength:ai.sessionLength||null,
+        playReason:ai.playReason||''
+      });
+    });
+    ps(97,'Saving…');
+    localStorage.setItem(SK, JSON.stringify(GAMES_PURE)); // save pure; overrides untouched
+    localStorage.setItem(TSK, String(Date.now()));
+    fbPushLibrary();
+    syncGames(); // reapply overrides
+    var stillUntagged=GAMES.filter(function(g){ return !g.genres||!g.genres.length||g.genres[0]==='?'; }).length;
+    plog('AI retry result: '+fixed+' newly tagged, '+stillUntagged+' still untagged');
+    if(stillUntagged>0) plog('⚠ '+stillUntagged+' games still show "?" — try Retry AI Only again in a few minutes');
+    ps(100,'Done!');
+    return sleep(400);
+  }).then(function(){ launchApp(); })
+  .catch(function(e){
+    plog('AI retry error: '+e.message);
+    console.error(e);
+    ps(100,'Error — '+e.message);
+  });
+}
+function doForceRetagAll(){
+  closeMM();
+  if(!GAMES||!GAMES.length){
+    alert('No library loaded yet. Use Full Refresh to import first.');
+    return;
+  }
+  var apiKey=localStorage.getItem('gv6_akey')||'';
+  if(!apiKey){
+    openMM();
+    setTimeout(function(){ alert('Enter your Groq API key above, then click Run 🤖 again.'); },200);
+    return;
+  }
+  var total=GAMES_PURE.length;
+  if(!confirm('Re-tag all '+total+' games with AI?\n\nThis overwrites the AI-generated tags for every game (not your manual edits).\nRatings, play logs, and tag overrides are untouched.\n\nThis may take several minutes.')) return;
+
+  var allGames=GAMES_PURE.slice();
+  showPS();
+  aiAnalyze._logged=false;
+  plog('Force Re-tag All: sending all '+total+' games to AI…');
+  var CHUNK=20;
+  var chunks=[];
+  for(var i=0;i<allGames.length;i+=CHUNK) chunks.push(allGames.slice(i,i+CHUNK));
+  plog('Split into '+chunks.length+' chunk(s) of up to '+CHUNK);
+  var aiResults=[];
+  chunks.reduce(function(chain,chunk,ci){
+    return chain.then(function(){
+      ps(10+Math.round(ci/chunks.length*80),null,'Tagging '+(ci*CHUNK+1)+'–'+Math.min((ci+1)*CHUNK,total)+'…',(ci*CHUNK)+'/'+total);
+      return aiAnalyze(chunk).then(function(res){
+        if(res){ aiResults=aiResults.concat(res); plog('Chunk '+(ci+1)+'/'+chunks.length+': '+res.length+' tagged'); }
+        else { plog('Chunk '+(ci+1)+'/'+chunks.length+' failed — those games keep old tags'); }
+        if(ci<chunks.length-1) return sleep(20000);
+      });
+    });
+  },Promise.resolve()).then(function(){
+    plog('AI done: '+aiResults.length+'/'+total+' games returned');
+    var aiMap={};
+    aiResults.forEach(function(a){
+      if(a&&a.title){
+        aiMap[a.title.toLowerCase()]=a;
+        var nn=normTitle(a.title);
+        if(nn&&!aiMap[nn]) aiMap[nn]=a;
+      }
+    });
+    var updated=0;
+    GAMES_PURE=GAMES_PURE.map(function(g){
+      var ai=aiMap[g.title.toLowerCase()]||aiMap[normTitle(g.title)];
+      if(!ai) return g; // AI didn't cover this game — keep existing tags
+      updated++;
+      return Object.assign({},g,{
+        genres:(ai.genres&&ai.genres.length)?ai.genres:['?'],
+        subgenre:ai.subgenre||'',
+        vibes:ai.vibes||[],
+        mp:(ai.mp&&ai.mp.length)?ai.mp:(g.steamMp&&g.steamMp.length?g.steamMp:[]),
+        difficulty:ai.difficulty||null,
+        sessionLength:ai.sessionLength||null,
+        playReason:ai.playReason||''
+      });
+    });
+    ps(97,'Saving…');
+    localStorage.setItem(SK,JSON.stringify(GAMES_PURE));
+    localStorage.setItem(TSK,String(Date.now()));
+    fbPushLibrary();
+    syncGames(); // reapply user overrides on top of fresh AI data
+    var stillUntagged=GAMES.filter(function(g){ return !g.genres||!g.genres.length||g.genres[0]==='?'; }).length;
+    plog('Re-tag complete: '+updated+' games updated, '+stillUntagged+' still untagged');
+    if(stillUntagged>0) plog('⚠ '+stillUntagged+' games still show "?" — try Run ⚡ Retry AI Only in a few minutes');
+    ps(100,'Done!');
+    return sleep(400);
+  }).then(function(){ launchApp(); })
+  .catch(function(e){
+    plog('Force re-tag error: '+e.message);
+    console.error(e);
+    ps(100,'Error — '+e.message);
+  });
+}
+function closeOv(id){ document.getElementById(id).classList.remove('open'); }
+function resetApp(){
+  if(!confirm('Return to import screen?\n\nYour play logs, ratings, comments, and tag edits will be kept.\nUse ⚙ Manage → Clear Library if you want a full wipe.')) return;
+  [SK,TK,TSK].forEach(function(k){ localStorage.removeItem(k); });
+  GAMES_PURE=[];
+  syncGames(); // clears GAMES to [] as well
+  document.getElementById('APP').style.display='none';
+  document.getElementById('OB').style.display='flex';
+  selM('file');
+}
+
+// ═══════════════════════════════════════════════════
+//  STARTUP
+// ═══════════════════════════════════════════════════
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    ['WIZ','MO','RP','QM','FM'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.classList.remove('open');
+    });
+    closeOv('EM'); closeMM();
+  }
+});
+
+(function(){
+  selM('file');
+  // Pre-fill API key if one was previously saved
+  var savedKey=localStorage.getItem('gv6_akey');
+  if(savedKey){ var kEl=document.getElementById('ob-akey'); if(kEl) kEl.value=savedKey; }
+  var savedRkey=localStorage.getItem(RAWG_SK);
+  if(savedRkey){ var rkEl=document.getElementById('ob-rkey'); if(rkEl) rkEl.value=savedRkey; }
+  var saved=localStorage.getItem(SK);
+  if(saved){
+    try{
+      GAMES_PURE=JSON.parse(saved);
+      // Migrate legacy single-genre string to genres array
+      GAMES_PURE=GAMES_PURE.map(function(g){
+        if(!g.genres) return Object.assign({},g,{genres:g.genre?[g.genre]:['?']});
+        return g;
+      });
+      // Migrate legacy overrides: genre string → genres array
+      var ovChanged=false;
+      Object.keys(OVERRIDES).forEach(function(title){
+        var ov=OVERRIDES[title];
+        if(ov&&ov.fields&&ov.fields.indexOf('genre')>-1&&!ov.genres){
+          ov.genres=[ov.genre];
+          ov.fields=ov.fields.map(function(f){ return f==='genre'?'genres':f; });
+          delete ov.genre;
+          ovChanged=true;
+        }
+      });
+      if(ovChanged) localStorage.setItem(OVERRIDES_K,JSON.stringify(OVERRIDES));
+      syncGames(); // apply any saved overrides on top
+      if(GAMES_PURE&&GAMES_PURE.length){
+        launchApp();
+        // Detect AI failure using pure data (overrides could mask '?' genres)
+        var actionPct=GAMES_PURE.filter(function(g){ var pg=pGenre(g); return pg==='Action'||pg==='?'; }).length/GAMES_PURE.length;
+        var noVibesPct=GAMES_PURE.filter(function(g){ return !g.vibes||!g.vibes.length; }).length/GAMES_PURE.length;
+        if(actionPct>0.8||noVibesPct>0.8){
+          var sw=document.getElementById('stale-w');
+          sw.style.display='block';
+          var hasKey=!!(localStorage.getItem('gv6_akey'));
+          sw.innerHTML='⚠ AI tagging incomplete'
+            +(hasKey
+              ? ' — <span style="cursor:pointer;text-decoration:underline" onclick="doRetryAiOnly()">⚡ Retry AI Only</span>'
+              : ' — add free Groq key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--amber)">console.groq.com/keys</a> then open <span style="cursor:pointer;text-decoration:underline" onclick="openMM()">⚙ Manage → Retry AI Only</span>');
+        }
+        return;
+      }
+    }catch(e){}
+  }
+  document.getElementById('OB').style.display='flex';
+})();
+</script>
+<script>
+// ═══════════════════════════════════════════════════
+//  FIREBASE SYNC
+// ═══════════════════════════════════════════════════
+var FB_CFG={
+  apiKey:'AIzaSyAiQmEo92ecfJqfXV9Bk4W6NyMA8fQ2doA',
+  authDomain:'sidekick-97e7e.firebaseapp.com',
+  projectId:'sidekick-97e7e',
+  storageBucket:'sidekick-97e7e.firebasestorage.app',
+  messagingSenderId:'989689815811',
+  appId:'1:989689815811:web:241fe304a6873f3185ff36'
+};
+var FB_APP=null, FB_AUTH=null, FB_DB=null;
+var FB_USER=null;
+var FB_READY=false;
+var FB_ROOM=localStorage.getItem('gv6_fbroom')||'';
+var FB_DNAME=localStorage.getItem('gv6_fbdname')||'';
+var FB_SYNCING=false;
+
+// ── Load & Init ──────────────────────────────────────
+function fbLoad(cb){
+  if(FB_READY){ cb(); return; }
+  var sdks=[
+    'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+    'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
+    'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
+  ];
+  function loadNext(i){
+    if(i>=sdks.length){
+      if(!FB_APP){
+        FB_APP=firebase.initializeApp(FB_CFG);
+        FB_AUTH=firebase.auth();
+        FB_DB=firebase.firestore();
+      }
+      FB_READY=true;
+      cb();
+      return;
+    }
+    var s=document.createElement('script');
+    s.src=sdks[i];
+    s.onload=function(){ loadNext(i+1); };
+    s.onerror=function(){ toast('Firebase SDK failed to load — check internet connection'); };
+    document.head.appendChild(s);
+  }
+  loadNext(0);
+}
+
+function fbInitAuth(){
+  if(!FB_AUTH||FB_AUTH._authStateListenerAttached) return;
+  FB_AUTH._authStateListenerAttached=true;
+  FB_AUTH.onAuthStateChanged(function(user){
+    FB_USER=user;
+    if(user){
+      FB_DNAME=user.displayName||'';
+      localStorage.setItem('gv6_fbuid',user.uid);
+      localStorage.setItem('gv6_fbdname',FB_DNAME);
+      fbUpdateAuthBtn();
+      updateMMSync();
+      if(FB_ROOM){ fbSyncDown(); } else { openRoomSetup(); }
+    } else {
+      FB_USER=null;
+      fbUpdateAuthBtn();
+      updateMMSync();
+    }
+  });
+}
+
+// ── Auth ─────────────────────────────────────────────
+function fbSignIn(){
+  fbLoad(function(){
+    fbInitAuth();
+    var provider=new firebase.auth.GoogleAuthProvider();
+    FB_AUTH.signInWithPopup(provider).catch(function(err){
+      toast('Sign-in failed: '+err.message);
+    });
+  });
+}
+
+function fbSignOut(){
+  if(!FB_AUTH) return;
+  if(!confirm('Sign out of Family Sync?')) return;
+  FB_AUTH.signOut().then(function(){
+    FB_USER=null; FB_DNAME=''; FB_ROOM='';
+    ['gv6_fbuid','gv6_fbdname','gv6_fbroom'].forEach(function(k){ localStorage.removeItem(k); });
+    fbUpdateAuthBtn();
+    updateMMSync();
+    fbSetStatus('');
+    toast('Signed out');
+  });
+}
+
+function fbUpdateAuthBtn(){
+  var btn=document.getElementById('fb-auth-btn');
+  if(!btn) return;
+  if(FB_USER){
+    var first=(FB_USER.displayName||'You').split(' ')[0];
+    btn.innerHTML=(FB_USER.photoURL?'<img src="'+esc(FB_USER.photoURL)+'" class="fb-avatar" onerror="this.style.display=\'none\'"> ':'')+esc(first);
+    btn.className='hbtn-sync authed';
+    btn.title='Signed in as '+(FB_USER.displayName||FB_USER.email)+(FB_ROOM?' · Room: '+FB_ROOM:' · No room')+'\nClick to sign out';
+    btn.onclick=fbSignOut;
+  } else {
+    btn.innerHTML='☁ Sign in';
+    btn.className='hbtn-sync';
+    btn.title='Sign in with Google to sync with your family';
+    btn.onclick=function(){ fbLoad(function(){ fbInitAuth(); fbSignIn(); }); };
+  }
+}
+
+// ── Room setup ───────────────────────────────────────
+function openRoomSetup(){
+  var rs=document.getElementById('RS');
+  if(rs) rs.classList.add('open');
+}
+function closeRoomSetup(){
+  var rs=document.getElementById('RS');
+  if(rs) rs.classList.remove('open');
+}
+
+function fbGenCode(){
+  var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', code='';
+  for(var i=0;i<6;i++) code+=c[Math.floor(Math.random()*c.length)];
+  return code;
+}
+
+function fbCreateRoom(){
+  if(!FB_USER||!FB_DB){ toast('Sign in first'); return; }
+  var nameEl=document.getElementById('rs-name-in');
+  var roomName=nameEl?nameEl.value.trim():'';
+  if(!roomName){ toast('Give your room a name first'); return; }
+  var code=fbGenCode();
+  fbSetStatus('Creating room…');
+  var roomRef=FB_DB.collection('rooms').doc(code);
+  roomRef.set({
+    name:roomName,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+    createdBy:FB_USER.uid
+  }).then(function(){
+    return roomRef.collection('members').doc(FB_USER.uid).set({
+      displayName:FB_USER.displayName||'',
+      photoURL:FB_USER.photoURL||'',
+      joinedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }).then(function(){
+    FB_ROOM=code;
+    localStorage.setItem('gv6_fbroom',code);
+    closeRoomSetup();
+    fbUpdateAuthBtn();
+    updateMMSync();
+    fbPushLibrary();
+    fbPushActivity();
+    fbPushPersonal();
+    fbSetStatus('Room created ✓');
+    toast('Room created! Code: '+code+' — share it with your family 🎮');
+  }).catch(function(err){ fbSetStatus(''); toast('Failed: '+err.message); });
+}
+
+function fbJoinRoom(){
+  if(!FB_USER||!FB_DB){ toast('Sign in first'); return; }
+  var codeEl=document.getElementById('rs-code-in');
+  var code=codeEl?codeEl.value.trim().toUpperCase():'';
+  if(!code){ toast('Enter a room code'); return; }
+  fbSetStatus('Joining…');
+  var roomRef=FB_DB.collection('rooms').doc(code);
+  roomRef.get().then(function(doc){
+    if(!doc.exists){ fbSetStatus(''); toast('Room not found — check the code'); return Promise.reject('nf'); }
+    return roomRef.collection('members').doc(FB_USER.uid).set({
+      displayName:FB_USER.displayName||'',
+      photoURL:FB_USER.photoURL||'',
+      joinedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }).then(function(){
+    FB_ROOM=code;
+    localStorage.setItem('gv6_fbroom',code);
+    closeRoomSetup();
+    fbUpdateAuthBtn();
+    updateMMSync();
+    fbSyncDown();
+  }).catch(function(err){ if(err!=='nf'){ fbSetStatus(''); toast('Join failed: '+err.message); } });
+}
+
+function fbLeaveRoom(){
+  if(!confirm('Leave this room?\nYou can rejoin any time with the same code.')) return;
+  FB_ROOM='';
+  localStorage.removeItem('gv6_fbroom');
+  fbUpdateAuthBtn();
+  updateMMSync();
+  fbSetStatus('');
+  toast('Left room');
+}
+
+// ── Sync down (pull) ─────────────────────────────────
+function fbSyncDown(){
+  if(!FB_USER||!FB_DB||!FB_ROOM) return;
+  if(FB_SYNCING) return;
+  FB_SYNCING=true;
+  fbSetStatus('Syncing…');
+  var roomRef=FB_DB.collection('rooms').doc(FB_ROOM);
+  Promise.all([
+    roomRef.collection('shared').doc('library').get(),
+    roomRef.collection('shared').doc('activity').get(),
+    roomRef.collection('personal').doc(FB_USER.uid).get()
+  ]).then(function(docs){
+    var libDoc=docs[0], actDoc=docs[1], persDoc=docs[2];
+
+    if(libDoc.exists){
+      var ld=libDoc.data();
+      if(ld.games&&ld.games.length){
+        GAMES_PURE=ld.games.map(function(g){
+          if(!g.genres) return Object.assign({},g,{genres:g.genre?[g.genre]:['?']});
+          return g;
+        });
+        localStorage.setItem(SK,JSON.stringify(GAMES_PURE));
+      }
+      if(ld.overrides){ OVERRIDES=ld.overrides; localStorage.setItem(OVERRIDES_K,JSON.stringify(OVERRIDES)); }
+    }
+
+    if(actDoc.exists){
+      var ad=actDoc.data();
+      // Plays: flat array → {title: [entries]} (public plays from all users)
+      var newPlays={};
+      (ad.plays||[]).forEach(function(e){
+        if(!newPlays[e.game]) newPlays[e.game]=[];
+        newPlays[e.game].push(e);
+      });
+      // Private plays from own data
+      var ownPriv=(persDoc.exists&&persDoc.data().privPlays)||[];
+      ownPriv.forEach(function(e){
+        if(!newPlays[e.game]) newPlays[e.game]=[];
+        newPlays[e.game].push(e);
+      });
+      Object.keys(newPlays).forEach(function(t){ newPlays[t].sort(function(a,b){ return b.ts-a.ts; }); });
+      PLAYS=newPlays;
+      localStorage.setItem(PK,JSON.stringify(PLAYS));
+
+      // Comments: flat array → {title: [entries]}
+      var newCmts={};
+      (ad.comments||[]).forEach(function(e){
+        if(!newCmts[e.game]) newCmts[e.game]=[];
+        newCmts[e.game].push(e);
+      });
+      Object.keys(newCmts).forEach(function(t){ newCmts[t].sort(function(a,b){ return b.ts-a.ts; }); });
+      CMTS=newCmts;
+      localStorage.setItem(CK,JSON.stringify(CMTS));
+      // Ratings: flat array → { title: { uid: stars } }
+      var newRatings={};
+      (ad.ratings||[]).forEach(function(e){
+        if(!newRatings[e.game]) newRatings[e.game]={};
+        newRatings[e.game][e.uid]=e.stars;
+      });
+      RATINGS=newRatings;
+      localStorage.setItem(RATINGS_K,JSON.stringify(RATINGS));
+      // Restore own star rating from RATINGS (so it survives on other devices)
+      if(FB_USER){
+        Object.keys(RATINGS).forEach(function(t){
+          if(RATINGS[t][FB_USER.uid]) STARS[t]=RATINGS[t][FB_USER.uid];
+        });
+        localStorage.setItem(STARS_K,JSON.stringify(STARS));
+      }
+    }
+
+    if(persDoc.exists){
+      var pd=persDoc.data();
+      if(pd.favs){ FAVS=pd.favs; localStorage.setItem(FK,JSON.stringify(FAVS)); }
+      if(pd.queue){ QUEUE=pd.queue; localStorage.setItem(QK,JSON.stringify(QUEUE)); }
+      if(pd.stars){ STARS=pd.stars; localStorage.setItem(STARS_K,JSON.stringify(STARS)); }
+    }
+
+    syncGames();
+    buildLibrary();
+    FB_SYNCING=false;
+    var t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    fbSetStatus('Synced '+t);
+    updateMMSync();
+  }).catch(function(err){
+    FB_SYNCING=false;
+    fbSetStatus('Sync failed');
+    console.warn('fbSyncDown:',err);
+  });
+}
+
+// ── Push functions ───────────────────────────────────
+function fbPushLibrary(){
+  if(!FB_USER||!FB_DB||!FB_ROOM) return;
+  FB_DB.collection('rooms').doc(FB_ROOM).collection('shared').doc('library').set({
+    games:GAMES_PURE,
+    overrides:OVERRIDES,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy:FB_DNAME||FB_USER.uid
+  }).catch(function(err){ console.warn('fbPushLibrary:',err); });
+}
+
+function fbPushActivity(){
+  if(!FB_USER||!FB_DB||!FB_ROOM) return;
+  // Separate public and private plays
+  var pubPlays=[], privPlays=[];
+  Object.keys(PLAYS).forEach(function(title){
+    (PLAYS[title]||[]).forEach(function(e){
+      var entry=Object.assign({},e,{game:title});
+      if(e.pub===false){ privPlays.push(entry); } else { pubPlays.push(entry); }
+    });
+  });
+  var comments=[];
+  Object.keys(CMTS).forEach(function(title){
+    (CMTS[title]||[]).forEach(function(e){ comments.push(Object.assign({},e,{game:title})); });
+  });
+  var ratings=[];
+  Object.keys(RATINGS).forEach(function(t){
+    Object.keys(RATINGS[t]).forEach(function(uid){
+      if(RATINGS[t][uid]) ratings.push({game:t,uid:uid,stars:RATINGS[t][uid]});
+    });
+  });
+  var roomRef=FB_DB.collection('rooms').doc(FB_ROOM);
+  roomRef.collection('shared').doc('activity').set({
+    plays:pubPlays,
+    comments:comments,
+    ratings:ratings,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(err){ console.warn('fbPushActivity:',err); });
+  // Private plays go in personal doc (merged with other personal data on next push)
+  if(privPlays.length) fbPushPersonal(privPlays);
+}
+
+function fbPushRating(){
+  if(!FB_USER||!FB_DB||!FB_ROOM) return;
+  var arr=[];
+  Object.keys(RATINGS).forEach(function(t){
+    Object.keys(RATINGS[t]).forEach(function(uid){
+      if(RATINGS[t][uid]) arr.push({game:t,uid:uid,stars:RATINGS[t][uid]});
+    });
+  });
+  FB_DB.collection('rooms').doc(FB_ROOM).collection('shared').doc('activity')
+    .set({ratings:arr,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+    .catch(function(err){ console.warn('fbPushRating:',err); });
+}
+
+function fbPushPersonal(privPlaysOverride){
+  if(!FB_USER||!FB_DB||!FB_ROOM) return;
+  var data={
+    favs:FAVS,
+    queue:QUEUE,
+    stars:STARS,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if(privPlaysOverride) data.privPlays=privPlaysOverride;
+  FB_DB.collection('rooms').doc(FB_ROOM).collection('personal').doc(FB_USER.uid).set(data,{merge:true}).catch(function(err){ console.warn('fbPushPersonal:',err); });
+}
+
+// ── UI helpers ───────────────────────────────────────
+function fbSetStatus(msg){
+  var el=document.getElementById('mm-status');
+  if(el) el.textContent=msg;
+}
+
+function updateMMSync(){
+  var el=document.getElementById('mm-sync-room');
+  if(!el) return;
+  if(FB_USER&&FB_ROOM){
+    el.innerHTML='<div class="mm-act">'
+      +'<div class="mm-act-info">'
+      +'<div class="mm-act-title" style="font-family:monospace;letter-spacing:.08em;color:var(--accent)">'+FB_ROOM+'</div>'
+      +'<div class="mm-act-desc">Signed in as '+(FB_USER.displayName||FB_USER.email)+'</div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px">'
+      +'<button class="mm-btn" onclick="fbSyncDown()">↓ Sync now</button>'
+      +'<button class="mm-btn" style="color:#f87171;border-color:rgba(248,113,113,.25)" onclick="fbLeaveRoom()">Leave</button>'
+      +'</div></div>';
+  } else if(FB_USER){
+    el.innerHTML='<div class="mm-act"><div class="mm-act-info">'
+      +'<div class="mm-act-title">Signed in — no room yet</div>'
+      +'<div class="mm-act-desc">Create or join a room to start syncing.</div>'
+      +'</div>'
+      +'<button class="mm-btn" onclick="openRoomSetup()">Set up room →</button></div>';
+  } else {
+    el.innerHTML='<div class="mm-act"><div class="mm-act-info">'
+      +'<div class="mm-act-title">Not signed in</div>'
+      +'<div class="mm-act-desc">Share your library, plays, and comments across devices with your family.</div>'
+      +'</div>'
+      +'<button class="mm-btn" onclick="fbLoad(function(){ fbInitAuth(); fbSignIn(); })">Sign in ☁</button></div>';
+  }
+}
+
+// Auto-init if previously signed in (restores session silently on page load)
+(function(){
+  if(localStorage.getItem('gv6_fbuid')){
+    fbLoad(function(){ fbInitAuth(); });
+  }
+}());
+</script>
+</body>
+</html>
