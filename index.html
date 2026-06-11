@@ -465,6 +465,7 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
       <button class="hbtn" id="queue-btn" onclick="openQM()">▶ Queue <b id="s-queue">0</b></button>
       <button class="hbtn" onclick="openEdit()">✏️ Edit</button>
       <button class="hbtn" onclick="openMM()">⚙ Manage</button>
+      <button class="hbtn" id="fb-sync-btn" onclick="fbSyncDown()" style="display:none" title="Sync with family room">☁ Sync</button>
       <button class="hbtn-sync" id="fb-auth-btn" title="Sign in to sync with family">☁ Sign in</button>
       <button class="hbtn danger" onclick="resetApp()">✕</button>
     </div>
@@ -2949,6 +2950,12 @@ function fbUpdateAuthBtn(){
     btn.title='Sign in with Google to sync with your family';
     btn.onclick=function(){ fbLoad(function(){ fbInitAuth(); fbSignIn(); }); };
   }
+  updateSyncBtn();
+}
+function updateSyncBtn(){
+  var btn=document.getElementById('fb-sync-btn');
+  if(!btn) return;
+  btn.style.display=(FB_USER&&FB_ROOM)?'':'none';
 }
 
 // ── Room setup ───────────────────────────────────────
@@ -3039,6 +3046,8 @@ function fbSyncDown(){
   if(FB_SYNCING) return;
   FB_SYNCING=true;
   fbSetStatus('Syncing…');
+  var _sb=document.getElementById('fb-sync-btn');
+  if(_sb){_sb.textContent='☁ Syncing…';_sb.disabled=true;}
   var roomRef=FB_DB.collection('rooms').doc(FB_ROOM);
   Promise.all([
     roomRef.collection('shared').doc('library').get(),
@@ -3111,13 +3120,17 @@ function fbSyncDown(){
     }
 
     syncGames();
-    buildLibrary();
+    buildPills();
+    updateStats();
+    renderGames();
     FB_SYNCING=false;
+    if(_sb){_sb.textContent='☁ Sync';_sb.disabled=false;}
     var t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     fbSetStatus('Synced '+t);
     updateMMSync();
   }).catch(function(err){
     FB_SYNCING=false;
+    if(_sb){_sb.textContent='☁ Sync';_sb.disabled=false;}
     fbSetStatus('Sync failed');
     console.warn('fbSyncDown:',err);
   });
@@ -3197,6 +3210,7 @@ function fbSetStatus(msg){
 }
 
 function updateMMSync(){
+  updateSyncBtn();
   var el=document.getElementById('mm-sync-room');
   if(!el) return;
   if(FB_USER&&FB_ROOM){
