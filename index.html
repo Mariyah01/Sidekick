@@ -459,14 +459,14 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
     </div>
     <div class="hdr-acts">
       <button class="hbtn-ham" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+      <button class="hbtn-sync" id="fb-auth-btn" title="Sign in to sync with family">☁ Sign in</button>
+      <button class="hbtn" id="fb-sync-btn" onclick="fbSyncDown()" style="display:none" title="Sync with family room">☁ Sync</button>
       <button class="hbtn hi" onclick="openWizard()">🎯 What to play?</button>
       <button class="hbtn" onclick="openRandom()">🎲 Random</button>
       <button class="hbtn" id="fav-btn" onclick="openFM()">⭐ Favorites <b id="s-fav">0</b></button>
       <button class="hbtn" id="queue-btn" onclick="openQM()">▶ Queue <b id="s-queue">0</b></button>
       <button class="hbtn" onclick="openEdit()">✏️ Edit</button>
       <button class="hbtn" onclick="openMM()">⚙ Manage</button>
-      <button class="hbtn" id="fb-sync-btn" onclick="fbSyncDown()" style="display:none" title="Sync with family room">☁ Sync</button>
-      <button class="hbtn-sync" id="fb-auth-btn" title="Sign in to sync with family">☁ Sign in</button>
       <button class="hbtn danger" onclick="resetApp()">✕</button>
     </div>
   </header>
@@ -2882,6 +2882,12 @@ function fbLoad(cb){
 function fbInitAuth(){
   if(!FB_AUTH||FB_AUTH._authStateListenerAttached) return;
   FB_AUTH._authStateListenerAttached=true;
+  // Handle mobile redirect sign-in returning to the page
+  FB_AUTH.getRedirectResult().then(function(result){
+    if(result&&result.user) FB_JUST_SIGNED_IN=true;
+  }).catch(function(err){
+    if(err.code!=='auth/no-current-user'&&err.code!=='auth/null-user') console.warn('getRedirectResult:',err);
+  });
   FB_AUTH.onAuthStateChanged(function(user){
     FB_USER=user;
     if(user){
@@ -2913,12 +2919,19 @@ function fbInitAuth(){
 function fbSignIn(){
   fbLoad(function(){
     fbInitAuth();
-    FB_JUST_SIGNED_IN=true;
     var provider=new firebase.auth.GoogleAuthProvider();
-    FB_AUTH.signInWithPopup(provider).catch(function(err){
-      FB_JUST_SIGNED_IN=false;
-      toast('Sign-in failed: '+err.message);
-    });
+    var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if(isMobile){
+      FB_AUTH.signInWithRedirect(provider).catch(function(err){
+        toast('Sign-in failed: '+err.message);
+      });
+    } else {
+      FB_JUST_SIGNED_IN=true;
+      FB_AUTH.signInWithPopup(provider).catch(function(err){
+        FB_JUST_SIGNED_IN=false;
+        toast('Sign-in failed: '+err.message);
+      });
+    }
   });
 }
 
@@ -3238,9 +3251,11 @@ function updateMMSync(){
   }
 }
 
-// Auto-init if previously signed in (restores session silently on page load)
+// Auto-init if previously signed in OR returning from a mobile redirect sign-in
 (function(){
-  if(localStorage.getItem('gv6_fbuid')){
+  var hasSavedUid=localStorage.getItem('gv6_fbuid');
+  var hasPendingRedirect=Object.keys(localStorage).some(function(k){ return k.indexOf('firebase:pendingRedirect')===0; });
+  if(hasSavedUid||hasPendingRedirect){
     fbLoad(function(){ fbInitAuth(); });
   }
 }());
