@@ -2895,6 +2895,7 @@ function fbInitAuth(){
   FB_AUTH.onAuthStateChanged(function(user){
     FB_USER=user;
     if(user){
+      var isRedirectReturn=!!sessionStorage.getItem('gv6_fb_redirect_pending');
       sessionStorage.removeItem('gv6_fb_redirect_pending');
       FB_DNAME=user.displayName||'';
       localStorage.setItem('gv6_fbuid',user.uid);
@@ -2910,7 +2911,7 @@ function fbInitAuth(){
           app.style.display='';
         }
         fbSyncDown();
-      } else if(FB_JUST_SIGNED_IN){ openRoomSetup(); }
+      } else if(FB_JUST_SIGNED_IN||isRedirectReturn){ openRoomSetup(); }
       FB_JUST_SIGNED_IN=false;
     } else {
       FB_USER=null;
@@ -2947,7 +2948,8 @@ function fbSignOut(){
   if(!confirm('Sign out of Family Sync?')) return;
   FB_AUTH.signOut().then(function(){
     FB_USER=null; FB_DNAME=''; FB_ROOM='';
-    ['gv6_fbuid','gv6_fbdname','gv6_fbroom'].forEach(function(k){ localStorage.removeItem(k); });
+    ['gv6_fbuid','gv6_fbdname'].forEach(function(k){ localStorage.removeItem(k); });
+    // Keep gv6_fbroom so room is rejoined automatically on next sign-in
     fbUpdateAuthBtn();
     updateMMSync();
     fbSetStatus('');
