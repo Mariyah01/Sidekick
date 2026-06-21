@@ -2947,14 +2947,16 @@ function fbInitAuth(){
       // Update the onboarding sign-in button if visible
       var obBtn=document.getElementById('ob-signin-btn');
       if(obBtn){ obBtn.textContent='✓ Signed in'; obBtn.disabled=true; obBtn.style.color='#4ade80'; }
+      var _freshSignIn=FB_JUST_SIGNED_IN||isRedirectReturn;
+      FB_JUST_SIGNED_IN=false;
       if(FB_ROOM){
-        // Keep Firestore user profile in sync so other devices can auto-find this room
+        // Room known locally — keep Firestore in sync and launch
         FB_DB.collection('users').doc(user.uid).set({roomCode:FB_ROOM,displayName:FB_DNAME},{merge:true}).catch(function(){});
         var ob=document.getElementById('OB');
         if(ob&&ob.style.display!=='none') ensureAppLaunched();
         fbSyncDown();
-      } else if(FB_JUST_SIGNED_IN||isRedirectReturn){
-        // No room in localStorage — look up in Firestore (set up on another device)
+      } else {
+        // No local room — always check Firestore (covers auto-restore on new device too)
         FB_DB.collection('users').doc(user.uid).get().then(function(doc){
           if(doc.exists&&doc.data().roomCode){
             FB_ROOM=doc.data().roomCode;
@@ -2964,16 +2966,18 @@ function fbInitAuth(){
             var ob2=document.getElementById('OB');
             if(ob2&&ob2.style.display!=='none') ensureAppLaunched();
             fbSyncDown();
-          } else {
+          } else if(_freshSignIn){
+            // Definitely just signed in and no room anywhere — offer setup
             toast('Signed in ✓ — set up your family room below');
             openRoomSetup();
           }
         }).catch(function(){
-          toast('Signed in ✓ — set up your family room below');
-          openRoomSetup();
+          if(_freshSignIn){
+            toast('Signed in ✓ — set up your family room below');
+            openRoomSetup();
+          }
         });
       }
-      FB_JUST_SIGNED_IN=false;
     } else {
       FB_USER=null;
       fbUpdateAuthBtn();
