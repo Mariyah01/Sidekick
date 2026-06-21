@@ -72,10 +72,10 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
 .hbtn.danger:hover{border-color:var(--red);color:var(--red);background:rgba(232,85,85,.08)}
 
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px)}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100dvh - 60px)}
 
 /* SIDEBAR */
-.sb{background:rgba(12,14,22,0.98);border-right:1px solid rgba(91,126,245,.1);padding:1rem;overflow-y:auto;height:calc(100vh - 60px);position:sticky;top:60px}
+.sb{background:rgba(12,14,22,0.98);border-right:1px solid rgba(91,126,245,.1);padding:1rem;overflow-y:auto;height:calc(100dvh - 60px);position:sticky;top:60px}
 .sb-sec{margin-bottom:1.125rem}
 .sb-lbl{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem}
 .sw{position:relative}
@@ -102,7 +102,7 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
 .clr:hover{border-color:var(--red);color:var(--red)}
 
 /* MAIN */
-.main{display:flex;flex-direction:column;min-height:calc(100vh - 60px)}
+.main{display:flex;flex-direction:column;min-height:calc(100dvh - 60px)}
 .wizard-banner{background:linear-gradient(135deg,rgba(91,126,245,.1),rgba(124,92,245,.06));border-bottom:1px solid rgba(91,126,245,.18);padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0}
 .wb-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px}
 .wb-sub{font-size:11px;color:var(--text2)}
@@ -192,7 +192,7 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
 .mo.open{opacity:1;pointer-events:all}
 .mw{background:rgba(15,19,30,0.95);border:1px solid rgba(91,126,245,.18);box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);border-radius:18px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(10px);transition:transform .2s;position:relative}
 .mo.open .mw{transform:translateY(0)}
-#RS{z-index:1010}
+#RS{z-index:10000}
 .mx{position:absolute;top:.875rem;right:.875rem;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.1);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;transition:background .15s,color .15s;font-size:12px;z-index:10}
 .mx:hover{background:rgba(0,0,0,.9)}
 .m-hero{width:100%;aspect-ratio:460/215;overflow:hidden;border-radius:18px 18px 0 0;position:relative;background:var(--bg3)}
@@ -333,6 +333,16 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
 .hbtn-ham{display:none;width:32px;height:32px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;color:var(--text2);cursor:pointer;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;padding:0;transition:border-color .15s,color .15s,background .15s}
 .hbtn-ham:hover{border-color:var(--accent);color:var(--accent);background:var(--aglow)}
 
+/* MOBILE SIDEBAR NAV — hidden on desktop, shown inside sidebar on mobile */
+.sb-mobile-acts{display:none}
+.sb-act-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sb-act-btn{border:1px solid var(--border);border-radius:var(--rs);padding:10px 4px 8px;background:transparent;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .15s,background .15s,color .15s;font-size:18px;width:100%}
+.sb-act-btn-lbl{font-size:10px;color:var(--text2);display:block;line-height:1;transition:color .15s;font-family:'DM Sans',sans-serif}
+.sb-act-btn:hover,.sb-act-btn:active{border-color:var(--accent);background:var(--aglow)}
+.sb-act-btn:hover .sb-act-btn-lbl,.sb-act-btn:active .sb-act-btn-lbl{color:var(--accent)}
+.sb-act-btn.hi{background:linear-gradient(135deg,rgba(91,126,245,.18),rgba(124,92,245,.12));border-color:rgba(91,126,245,.45);color:#a5b4fc}
+.sb-act-btn.hi .sb-act-btn-lbl{color:#a5b4fc}
+
 /* TABLET (861px–1100px) — narrower sidebar */
 @media(max-width:1100px){
   .layout{grid-template-columns:200px 1fr}
@@ -343,17 +353,19 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
   .layout{grid-template-columns:1fr}
   /* Slide-in drawer */
   .sb{
-    position:fixed;left:0;top:60px;bottom:0;width:282px;z-index:200;
+    position:fixed;left:0;top:60px;bottom:0;width:min(300px,85vw);z-index:200;
     transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
     box-shadow:8px 0 32px rgba(0,0,0,.5);height:auto
   }
   .sb.open{transform:translateX(0)}
   .sb-overlay.open{display:block}
-  /* Header */
+  /* Header — no overflow scroll, clean row */
   .hdr-stats{display:none}
   .hbtn-ham{display:flex}
-  .hdr-acts{overflow-x:auto;-webkit-overflow-scrolling:touch;gap:4px;scrollbar-width:none}
-  .hdr-acts::-webkit-scrollbar{display:none}
+  .hbtn-secondary{display:none}
+  .hdr-acts{overflow:visible;flex-wrap:nowrap;gap:6px}
+  /* Show mobile nav section in sidebar */
+  .sb-mobile-acts{display:block}
   /* List items */
   .li{grid-template-columns:46px 1fr auto}
   /* Modals — slide up from bottom */
@@ -361,7 +373,8 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
   .mw{max-height:92vh;border-radius:18px 18px 0 0;max-width:100%}
   /* Cards */
   .gg{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  /* Overlays */
+  /* Overlays — slide up from bottom */
+  .ov{padding:0;align-items:flex-end}
   .ow{border-radius:18px 18px 0 0;max-height:92vh}
 }
 
@@ -370,6 +383,8 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
   .gg{grid-template-columns:1fr 1fr;gap:.5rem}
   .scroll-area{padding:.625rem}
   .hdr{padding:0 .75rem;gap:.5rem}
+  /* Shrink "What to play?" label on smallest screens */
+  .hbtn.hi{font-size:11px;padding:5px 8px}
   #OB{align-items:flex-start;overflow-y:auto;padding:1.25rem 1rem}
   .ob-wrap{padding:.5rem 0 2rem}
   .ob-logo{font-size:28px;margin-bottom:.1rem}
@@ -381,6 +396,11 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
   .mgrid{grid-template-columns:1fr}
   .wiz-opts.cols2{grid-template-columns:1fr}
   .rec-img{width:80px}
+}
+/* VERY SMALL PHONES (<= 360px) */
+@media(max-width:360px){
+  .hbtn.hi span,.hbtn.hi{font-size:0;padding:5px 8px}
+  .hbtn.hi::before{content:'🎯';font-size:14px}
 }
 /* FIREBASE AUTH */
 .hbtn-sync{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap}
@@ -466,17 +486,28 @@ a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif}
       <button class="hbtn-sync" id="fb-auth-btn" title="Sign in to sync with family">☁ Sign in</button>
       <button class="hbtn" id="fb-sync-btn" onclick="fbSyncDown()" style="display:none" title="Sync with family room">☁ Sync</button>
       <button class="hbtn hi" onclick="openWizard()">🎯 What to play?</button>
-      <button class="hbtn" onclick="openRandom()">🎲 Random</button>
-      <button class="hbtn" id="fav-btn" onclick="openFM()">⭐ Favorites <b id="s-fav">0</b></button>
-      <button class="hbtn" id="queue-btn" onclick="openQM()">▶ Queue <b id="s-queue">0</b></button>
-      <button class="hbtn" onclick="openEdit()">✏️ Edit</button>
-      <button class="hbtn" onclick="openMM()">⚙ Manage</button>
-      <button class="hbtn danger" onclick="resetApp()">✕</button>
+      <button class="hbtn hbtn-secondary" onclick="openRandom()">🎲 Random</button>
+      <button class="hbtn hbtn-secondary" id="fav-btn" onclick="openFM()">⭐ Favorites <b id="s-fav">0</b></button>
+      <button class="hbtn hbtn-secondary" id="queue-btn" onclick="openQM()">▶ Queue <b id="s-queue">0</b></button>
+      <button class="hbtn hbtn-secondary" onclick="openEdit()">✏️ Edit</button>
+      <button class="hbtn hbtn-secondary" onclick="openMM()">⚙ Manage</button>
+      <button class="hbtn danger hbtn-secondary" onclick="resetApp()">✕</button>
     </div>
   </header>
   <div class="layout">
     <div class="sb-overlay" id="SBO" onclick="closeSidebar()"></div>
     <aside class="sb" id="SB">
+      <div class="sb-sec sb-mobile-acts">
+        <div class="sb-lbl">Actions</div>
+        <div class="sb-act-grid">
+          <button class="sb-act-btn hi" onclick="openWizard();closeSidebar()">🎯<span class="sb-act-btn-lbl">What to play</span></button>
+          <button class="sb-act-btn" onclick="openRandom();closeSidebar()">🎲<span class="sb-act-btn-lbl">Random</span></button>
+          <button class="sb-act-btn" onclick="openFM();closeSidebar()">⭐<span class="sb-act-btn-lbl">Favorites</span></button>
+          <button class="sb-act-btn" onclick="openQM();closeSidebar()">▶<span class="sb-act-btn-lbl">Queue</span></button>
+          <button class="sb-act-btn" onclick="openEdit();closeSidebar()">✏️<span class="sb-act-btn-lbl">Edit</span></button>
+          <button class="sb-act-btn" onclick="openMM();closeSidebar()">⚙<span class="sb-act-btn-lbl">Manage</span></button>
+        </div>
+      </div>
       <div class="sb-sec">
         <div class="sb-lbl">Search</div>
         <div class="sw">
@@ -1657,18 +1688,28 @@ function showPS(){
   document.getElementById('ps-log').innerHTML='';
   ps(0,'Starting…','','');
 }
-function launchApp(){
-  document.getElementById('PS').style.display='none';
+function ensureAppLaunched(){
   document.getElementById('OB').style.display='none';
+  document.getElementById('PS').style.display='none';
   document.getElementById('APP').style.display='block';
-  buildPills();
+  if(!APP_LAUNCHED){
+    APP_LAUNCHED=true;
+    buildPills();
+    var _st;
+    var qEl=document.getElementById('Q');
+    var sortEl=document.getElementById('SORT');
+    if(qEl) qEl.addEventListener('input',function(){ clearTimeout(_st); _st=setTimeout(renderGames,160); });
+    if(sortEl) sortEl.addEventListener('change',renderGames);
+    document.querySelectorAll('.pill[data-f]').forEach(function(b){ b.addEventListener('click',toggleF); });
+    var ts=parseInt(localStorage.getItem(TSK)||'0');
+    if(Date.now()-ts > 7*86400000) document.getElementById('stale-w').style.display='block';
+  }
   updateStats();
   renderGames();
-  var _st; document.getElementById('Q').addEventListener('input', function(){ clearTimeout(_st); _st=setTimeout(renderGames,160); });
-  document.getElementById('SORT').addEventListener('change', renderGames);
-  document.querySelectorAll('.pill[data-f]').forEach(function(b){ b.addEventListener('click', toggleF); });
-  var ts=parseInt(localStorage.getItem(TSK)||'0');
-  if(Date.now()-ts > 7*86400000) document.getElementById('stale-w').style.display='block';
+}
+function launchApp(){
+  document.getElementById('PS').style.display='none';
+  ensureAppLaunched();
 }
 
 function buildPills(){
@@ -2854,6 +2895,7 @@ var FB_ROOM=localStorage.getItem('gv6_fbroom')||'';
 var FB_DNAME=localStorage.getItem('gv6_fbdname')||'';
 var FB_SYNCING=false;
 var FB_JUST_SIGNED_IN=false;
+var APP_LAUNCHED=false;
 
 // ── Load & Init ──────────────────────────────────────
 function fbLoad(cb){
@@ -2902,16 +2944,35 @@ function fbInitAuth(){
       localStorage.setItem('gv6_fbdname',FB_DNAME);
       fbUpdateAuthBtn();
       updateMMSync();
+      // Update the onboarding sign-in button if visible
+      var obBtn=document.getElementById('ob-signin-btn');
+      if(obBtn){ obBtn.textContent='✓ Signed in'; obBtn.disabled=true; obBtn.style.color='#4ade80'; }
       if(FB_ROOM){
-        // If still on onboarding screen, show app shell first then sync
+        // Keep Firestore user profile in sync so other devices can auto-find this room
+        FB_DB.collection('users').doc(user.uid).set({roomCode:FB_ROOM,displayName:FB_DNAME},{merge:true}).catch(function(){});
         var ob=document.getElementById('OB');
-        var app=document.getElementById('APP');
-        if(ob&&ob.style.display!=='none'&&app&&app.style.display==='none'){
-          ob.style.display='none';
-          app.style.display='';
-        }
+        if(ob&&ob.style.display!=='none') ensureAppLaunched();
         fbSyncDown();
-      } else if(FB_JUST_SIGNED_IN||isRedirectReturn){ openRoomSetup(); }
+      } else if(FB_JUST_SIGNED_IN||isRedirectReturn){
+        // No room in localStorage — look up in Firestore (set up on another device)
+        FB_DB.collection('users').doc(user.uid).get().then(function(doc){
+          if(doc.exists&&doc.data().roomCode){
+            FB_ROOM=doc.data().roomCode;
+            localStorage.setItem('gv6_fbroom',FB_ROOM);
+            fbUpdateAuthBtn();
+            updateMMSync();
+            var ob2=document.getElementById('OB');
+            if(ob2&&ob2.style.display!=='none') ensureAppLaunched();
+            fbSyncDown();
+          } else {
+            toast('Signed in ✓ — set up your family room below');
+            openRoomSetup();
+          }
+        }).catch(function(){
+          toast('Signed in ✓ — set up your family room below');
+          openRoomSetup();
+        });
+      }
       FB_JUST_SIGNED_IN=false;
     } else {
       FB_USER=null;
@@ -2927,10 +2988,32 @@ function fbSignIn(){
     fbInitAuth();
     var provider=new firebase.auth.GoogleAuthProvider();
     FB_JUST_SIGNED_IN=true;
-    FB_AUTH.signInWithPopup(provider).catch(function(err){
+    // On touch devices: if popup closes but auth never arrives (Firefox COOP blocks
+    // postMessage from popup), detect it on focus and fall back to redirect.
+    var _isMobile=(navigator.maxTouchPoints||0)>0;
+    var _fbFocusFallback=null;
+    if(_isMobile){
+      _fbFocusFallback=function(){
+        window.removeEventListener('focus',_fbFocusFallback);
+        setTimeout(function(){
+          if(!FB_USER&&FB_AUTH){
+            // Popup returned but no auth state — use redirect as fallback
+            localStorage.setItem('gv6_fb_redirect_pending','1');
+            var p2=new firebase.auth.GoogleAuthProvider();
+            FB_AUTH.signInWithRedirect(p2).catch(function(e3){
+              localStorage.removeItem('gv6_fb_redirect_pending');
+            });
+          }
+        },2500);
+      };
+      window.addEventListener('focus',_fbFocusFallback);
+    }
+    FB_AUTH.signInWithPopup(provider).then(function(){
+      if(_fbFocusFallback) window.removeEventListener('focus',_fbFocusFallback);
+    }).catch(function(err){
+      if(_fbFocusFallback) window.removeEventListener('focus',_fbFocusFallback);
       FB_JUST_SIGNED_IN=false;
       if(err.code==='auth/popup-blocked'){
-        // Popup blocked (some mobile browsers) — fall back to redirect
         localStorage.setItem('gv6_fb_redirect_pending','1');
         FB_AUTH.signInWithRedirect(provider).catch(function(e2){
           localStorage.removeItem('gv6_fb_redirect_pending');
@@ -3018,9 +3101,11 @@ function fbCreateRoom(){
   }).then(function(){
     FB_ROOM=code;
     localStorage.setItem('gv6_fbroom',code);
+    FB_DB.collection('users').doc(FB_USER.uid).set({roomCode:code,displayName:FB_DNAME},{merge:true}).catch(function(){});
     closeRoomSetup();
     fbUpdateAuthBtn();
     updateMMSync();
+    ensureAppLaunched();
     fbPushLibrary();
     fbPushActivity();
     fbPushPersonal();
@@ -3046,15 +3131,18 @@ function fbJoinRoom(){
   }).then(function(){
     FB_ROOM=code;
     localStorage.setItem('gv6_fbroom',code);
+    FB_DB.collection('users').doc(FB_USER.uid).set({roomCode:code,displayName:FB_DNAME},{merge:true}).catch(function(){});
     closeRoomSetup();
     fbUpdateAuthBtn();
     updateMMSync();
+    ensureAppLaunched();
     fbSyncDown();
   }).catch(function(err){ if(err!=='nf'){ fbSetStatus(''); toast('Join failed: '+err.message); } });
 }
 
 function fbLeaveRoom(){
   if(!confirm('Leave this room?\nYou can rejoin any time with the same code.')) return;
+  if(FB_USER&&FB_DB) FB_DB.collection('users').doc(FB_USER.uid).set({roomCode:''},{merge:true}).catch(function(){});
   FB_ROOM='';
   localStorage.removeItem('gv6_fbroom');
   fbUpdateAuthBtn();
@@ -3143,9 +3231,14 @@ function fbSyncDown(){
     }
 
     syncGames();
-    buildPills();
-    updateStats();
-    renderGames();
+    var ob3=document.getElementById('OB');
+    if(ob3&&ob3.style.display!=='none'){
+      ensureAppLaunched();
+    } else {
+      buildPills();
+      updateStats();
+      renderGames();
+    }
     FB_SYNCING=false;
     if(_sb){_sb.textContent='☁ Sync';_sb.disabled=false;}
     var t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
