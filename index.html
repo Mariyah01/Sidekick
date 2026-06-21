@@ -2895,6 +2895,7 @@ function fbInitAuth(){
   FB_AUTH.onAuthStateChanged(function(user){
     FB_USER=user;
     if(user){
+      sessionStorage.removeItem('gv6_fb_redirect_pending');
       FB_DNAME=user.displayName||'';
       localStorage.setItem('gv6_fbuid',user.uid);
       localStorage.setItem('gv6_fbdname',FB_DNAME);
@@ -2926,7 +2927,9 @@ function fbSignIn(){
     var provider=new firebase.auth.GoogleAuthProvider();
     var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
     if(isMobile){
+      sessionStorage.setItem('gv6_fb_redirect_pending','1');
       FB_AUTH.signInWithRedirect(provider).catch(function(err){
+        sessionStorage.removeItem('gv6_fb_redirect_pending');
         toast('Sign-in failed: '+err.message);
       });
     } else {
@@ -3258,7 +3261,7 @@ function updateMMSync(){
 // Auto-init if previously signed in OR returning from a mobile redirect sign-in
 (function(){
   var hasSavedUid=localStorage.getItem('gv6_fbuid');
-  var hasPendingRedirect=Object.keys(localStorage).some(function(k){ return k.indexOf('firebase:pendingRedirect')===0; });
+  var hasPendingRedirect=sessionStorage.getItem('gv6_fb_redirect_pending');
   if(hasSavedUid||hasPendingRedirect){
     fbLoad(function(){ fbInitAuth(); });
   }
