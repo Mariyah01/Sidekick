@@ -2926,20 +2926,20 @@ function fbSignIn(){
   fbLoad(function(){
     fbInitAuth();
     var provider=new firebase.auth.GoogleAuthProvider();
-    var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    if(isMobile){
-      localStorage.setItem('gv6_fb_redirect_pending','1');
-      FB_AUTH.signInWithRedirect(provider).catch(function(err){
-        localStorage.removeItem('gv6_fb_redirect_pending');
+    FB_JUST_SIGNED_IN=true;
+    FB_AUTH.signInWithPopup(provider).catch(function(err){
+      FB_JUST_SIGNED_IN=false;
+      if(err.code==='auth/popup-blocked'){
+        // Popup blocked (some mobile browsers) — fall back to redirect
+        localStorage.setItem('gv6_fb_redirect_pending','1');
+        FB_AUTH.signInWithRedirect(provider).catch(function(e2){
+          localStorage.removeItem('gv6_fb_redirect_pending');
+          toast('Sign-in failed: '+e2.message);
+        });
+      } else if(err.code!=='auth/popup-closed-by-user'){
         toast('Sign-in failed: '+err.message);
-      });
-    } else {
-      FB_JUST_SIGNED_IN=true;
-      FB_AUTH.signInWithPopup(provider).catch(function(err){
-        FB_JUST_SIGNED_IN=false;
-        toast('Sign-in failed: '+err.message);
-      });
-    }
+      }
+    });
   });
 }
 
